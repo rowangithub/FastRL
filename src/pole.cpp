@@ -39,7 +39,6 @@ void Pole::step(int action)
 	dtheta_ += TAU * thetaacc;
 }
 
-template<>
 void Pole::log(Logger *logger, int action)
 {
 	static const double cart_width = 0.2;

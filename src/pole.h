@@ -14,6 +14,8 @@
 
 #include "utils.h"
 
+class Logger;
+
 class Pole {
 public:
 	Pole() {
@@ -55,7 +57,6 @@ public:
 				x_ << " " << dx_ << " " << theta_ << " " << dtheta_;
 	}
 
-	template<class Logger>
 	void log(Logger *logger, int action);
 
 private:

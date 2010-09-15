@@ -8,7 +8,7 @@
 #ifndef AGENT_H_
 #define AGENT_H_
 
-#include "state.h"
+class State;
 
 class Agent {
 public:

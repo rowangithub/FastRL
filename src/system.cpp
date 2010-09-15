@@ -6,6 +6,8 @@
  */
 
 #include <iostream>
+
+#include "state.h"
 #include "system.h"
 #include "agent.h"
 #include "logger.h"
