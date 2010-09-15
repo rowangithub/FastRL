@@ -3,6 +3,7 @@
 #include "system.h"
 #include "agent.h"
 #include "qlearning.h"
+#include "monte-carlo.h"
 
 /**
  * TODO:
@@ -20,22 +21,36 @@
 
 using namespace std;
 
+Agent *CreatorAgent(AgentType agent_t, bool train)
+{
+	switch (agent_t) {
+	case AT_QLearning: return new QLearningAgent(!train);
+	case AT_MonteCarlo: return new MonteCarloAgent(!train);
+	default: return 0;
+	}
+}
+
 void usage(const char *progname) {
-	cout << "Usage:\n\t" << progname << " [-t] [-s seed] [-d]\n"
+	cerr << "Usage:\n\t" << progname << " [-t] [-s seed] [-d]\n"
 			<< "Options:\n"
 			<< "\t-t\ttrain mode\n"
 			<< "\t-s\tset random seed\n"
+			<< "\t-q\tuse q-learning method\n"
+			<< "\t-m\tuse monte-carlo method\n"
 			;
 }
 
 int main(int argc, char **argv) {
 	int seed = getpid();
 	bool train = false;
+	AgentType agent_t = AT_None;
 
 	int  opt;
-	while ((opt = getopt(argc, argv, "dts:")) != -1) {
+	while ((opt = getopt(argc, argv, "qmts:")) != -1) {
 		switch (opt) {
 		case 't': train = true; break;
+		case 'q': agent_t = AT_QLearning; break;
+		case 'm': agent_t = AT_MonteCarlo; break;
 		case 's': seed = atoi(optarg); break;
 		default: usage(argv[0]); exit(1);
 		}
@@ -43,26 +58,32 @@ int main(int argc, char **argv) {
 
 	srand48(seed);
 
+	Agent *agent = CreatorAgent(agent_t, train);
+
+	if (!agent) {
+		cerr << "Error: No learning method provided" << endl;
+		usage(argv[0]);
+		return 1;
+	}
+
 	if (!train) { //test
-		QLearningAgent agent(-0.0, true);
 		Logger logger("cart-pole.rcg");
-		double reward = System().simulate(agent, true, & logger);
+		double reward = System().simulate(*agent, true, & logger);
 		cout << "Reward: " << reward << endl;
 	}
 	else { //train
 		const int episodes = 1024;
-
-		QLearningAgent agent;
-
 		double rewards = 0.0;
 		int loops = episodes;
 
 		do {
-			rewards += System().simulate(agent, false);
+			rewards += System().simulate(*agent, false);
 		} while(loops--);
 
 		cout << "#Avg Reward:\n" << rewards / double(episodes) << endl;
 	}
+
+	delete agent;
 
 	return 0;
 }

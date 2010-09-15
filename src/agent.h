@@ -8,25 +8,42 @@
 #ifndef AGENT_H_
 #define AGENT_H_
 
+#include <cstdlib>
+
 class State;
+
+enum AgentType {
+	AT_None,
+	AT_QLearning,
+	AT_MonteCarlo
+};
 
 class Agent {
 public:
-	virtual int plan(const State &) {
-		return 0;
-	}
-
-	virtual double learn(const State &, int, double, const State &) {
-		return 0.0;
-	}
-
-	virtual void fail(const State &, int) {
+	Agent(const bool test): test_(test) {
 
 	}
+
+	virtual ~Agent() { }
+
+	virtual int plan(const State &) = 0;
+	virtual void learn(const State &, int, double, const State &) = 0;
+	virtual void fail(const State &, int, double) = 0;
+
+	const bool & test() const { return test_; }
+
+private:
+	const bool test_;
 };
 
 class RandomAgent: public Agent {
 public:
+	RandomAgent(const bool test): Agent(test) {
+
+	}
+
+	virtual ~RandomAgent() { }
+
 	virtual int plan(const State &) {
 		double prob = drand48();
 
@@ -40,6 +57,9 @@ public:
 			return 0;
 		}
 	}
+
+	virtual void learn(const State &, int, double, const State &) { }
+	virtual void fail(const State &, int, double) { }
 };
 
 #endif /* AGENT_H_ */

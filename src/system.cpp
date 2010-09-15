@@ -18,7 +18,6 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 {
 	int step = 0;
 	double rewards = 0.0;
-	double mse = 0.0;
 	State state = pole_.get_signal<State>();
 
 	do {
@@ -38,7 +37,7 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		pole_.step(action);
 
 		if (pole_.fail()) {
-			agent.fail(state, action); //failure state - 区别失败状态跟一般未知状态（未知状态初始化为零）
+			agent.fail(state, action, get_terminal_reward()); //failure state - 区别失败状态跟一般未知状态（未知状态初始化为零）
 			if (verbose) {
 				cout << " | Failure" << endl;
 			}
@@ -46,12 +45,10 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 			break;
 		}
 
-		State pre_state = state;
-		state = pole_.get_signal<State>();
-
+		State post_state = pole_.get_signal<State>();
 		double reward = get_reward(action);
-		double error = agent.learn(pre_state, action, reward, state);
-		mse += error * error;
+		agent.learn(state, action, reward, post_state);
+		state = post_state;
 
 		if (verbose) {
 			cout << " | Reward: " << reward << endl;
@@ -63,7 +60,6 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 	if (verbose) {
 		pole_.print_state(step);
 		cout << " | State: " << pole_.get_signal<State>() <<  " | The End" << endl;
-		cout << "MSE: " << mse << endl;
 	}
 
 	if (logger) {

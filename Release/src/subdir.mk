@@ -6,6 +6,7 @@
 CPP_SRCS += \
 ../src/logger.cpp \
 ../src/main.cpp \
+../src/monte-carlo.cpp \
 ../src/pole.cpp \
 ../src/qlearning.cpp \
 ../src/system.cpp 
@@ -13,6 +14,7 @@ CPP_SRCS += \
 OBJS += \
 ./src/logger.o \
 ./src/main.o \
+./src/monte-carlo.o \
 ./src/pole.o \
 ./src/qlearning.o \
 ./src/system.o 
@@ -20,6 +22,7 @@ OBJS += \
 CPP_DEPS += \
 ./src/logger.d \
 ./src/main.d \
+./src/monte-carlo.d \
 ./src/pole.d \
 ./src/qlearning.d \
 ./src/system.d 

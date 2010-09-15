@@ -13,7 +13,6 @@
 #include <iostream>
 #include<fstream>
 #include <cmath>
-#include <cstdlib>
 #include <iomanip>
 #include <algorithm>
 #include <cassert>
@@ -25,29 +24,32 @@
  */
 class QLearningAgent: public RandomAgent {
 private:
+	static const double epsilon_ = 0.9;
 	static const double alpha = 0.5;
 	static const double gamma = 1.0 - 1.0e-6;
 
 public:
-	QLearningAgent(const double epsilon = 0.01, const bool test = false): epsilon_(epsilon), test_(test) {
+	QLearningAgent(const bool test): RandomAgent(test) {
 		qtable_.load("qtable.txt");
 	}
 
-	~QLearningAgent() {
-		if (!test_) {
+	virtual ~QLearningAgent() {
+		if (!test()) {
 			qtable_.save("qtable.txt");
 		}
 	}
 
-	int plan(const State & state);
+	virtual int plan(const State & state);
+	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state);
+	virtual void fail(const State & state, int action, double reward);
+
 	int greedy(const State & state);
-	double learn(const State & pre_state, int pre_action, double reward, const State & state);
-	void fail(const State & state, int action);
+
+public:
+	QTable & qtable() { return qtable_; }
 
 private:
 	QTable qtable_;
-	const double epsilon_;
-	const bool test_;
 };
 
 

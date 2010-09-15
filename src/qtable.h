@@ -8,49 +8,24 @@
 #ifndef QTABLE_H_
 #define QTABLE_H_
 
-#include <vector>
-#include <map>
-
 #include "state.h"
+#include "auto-table.h"
 
-class QTable {
-	typedef boost::tuples::tuple<State, int> state_action_pair_t;
+typedef boost::tuples::tuple<State, int> state_action_pair_t;
 
+template<class DataType>
+class StateActionPairTable: public AutoTable<state_action_pair_t, DataType> {
 public:
-	double & operator()(const State & state, int action) {
-		return table_[boost::tuples::make_tuple(state, action)];
+	DataType & operator[](const state_action_pair_t & state_action_pair) {
+		return AutoTable<state_action_pair_t, DataType>::table()[state_action_pair];
 	}
 
-	void save(const char *file_name) const {
-		std::ofstream fout(file_name);
-
-		if (fout.good()) {
-			for (std::map<state_action_pair_t, double>::const_iterator it = table_.begin(); it != table_.end(); ++it) {
-				fout << it->first << " " << std::setprecision(13) << it->second << std::endl;
-			}
-		}
-
-		fout.close();
+	DataType & operator()(const State & state, int action) {
+		return AutoTable<state_action_pair_t, DataType>::table()[boost::tuples::make_tuple(state, action)];
 	}
+};
 
-	void load(const char *file_name) {
-		std::ifstream fin(file_name);
-
-		if (fin.good()) {
-			state_action_pair_t state_action_pair;
-			double qvalue;
-
-			while (!fin.eof()) {
-				fin >> state_action_pair >> qvalue;
-				table_[state_action_pair] = qvalue;
-			}
-		}
-
-		fin.close();
-	}
-
-private:
-	std::map<state_action_pair_t, double> table_;
+class QTable: public StateActionPairTable<double> {
 };
 
 #endif /* QTABLE_H_ */

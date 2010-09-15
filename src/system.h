@@ -30,6 +30,10 @@ public:
 		return cos(pole_.theta()) + cos(pole_.dtheta()) - fabs(pole_.dx()) - abs(action); //以保持不动为最佳
 	}
 
+	double get_terminal_reward() {
+		return -10.0;
+	}
+
 	double simulate(Agent & agent, bool verbose = true, Logger *logger = 0);
 
 private:

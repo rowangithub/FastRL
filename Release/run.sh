@@ -2,6 +2,7 @@
 
 HISTORY="history"
 QTABLE="qtable.txt"
+VISITS="visits.txt"
 DATA="pp"
 
 rm -f $QTABLE
@@ -15,6 +16,5 @@ mkdir $HISTORY
 
 for i in `seq 1 1024`; do
     ./pole -t $* >>$DATA
-    cp $QTABLE $HISTORY/$QTABLE-$i
 done
 

@@ -14,7 +14,7 @@ void Pole::step(int action)
 	static const double GRAVITY = 9.8;
 	static const double MASSCART = 1.0;
 	static const double MASSPOLE = 0.1;
-	static const double TOTAL_MASS = (MASSPOLE + MASSCART);
+	static const double TOTAL_MASS = MASSPOLE + MASSCART;
 	static const double LENGTH = 0.5;        /* actually half the pole's length */
 	static const double POLEMASS_LENGTH = (MASSPOLE * LENGTH);
 	static const double FORCE_MAG = 10.0;

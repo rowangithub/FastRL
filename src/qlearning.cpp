@@ -14,8 +14,21 @@ int QLearningAgent::plan(const State & state)
 		return RandomAgent::plan(state);
 	}
 	else {
-		return this->greedy(state);
+		return greedy(state);
 	}
+}
+
+void QLearningAgent::learn(const State & state, int action, double reward, const State & post_state)
+{
+	double & u = qtable_(state, action);
+	const double & v = qtable_(post_state, greedy(post_state));
+
+	u += alpha * (reward + gamma * v - u);
+}
+
+void QLearningAgent::fail(const State & state, int action, double reward)
+{
+	qtable_(state, action) = reward;
 }
 
 int QLearningAgent::greedy(const State & state)
@@ -43,22 +56,4 @@ int QLearningAgent::greedy(const State & state)
 		assert(0);
 		return RandomAgent::plan(state);
 	}
-}
-
-double QLearningAgent::learn(const State & pre_state, int pre_action, double reward, const State & state)
-{
-	int action = greedy(state);
-	double & u = qtable_(pre_state, pre_action);
-	double v = qtable_(state, action);
-
-	double error = alpha * (reward + gamma * v - u);
-
-	u = u + error;
-
-	return error;
-}
-
-void QLearningAgent::fail(const State & state, int action)
-{
-	qtable_(state, action) = -10.0;
 }
