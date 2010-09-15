@@ -18,7 +18,7 @@
  * TODO:
  * 		1、增加状态粒度 - done，增加粒度可以得到更细致的策略
  * 		2、改进回报函数 - done，回报函数越能精确区分（状态、动作）越有利于学习
- *      3、增加泛化能力
+ *      3、增加泛化能力 - 不用了
  *      4、验证以上各项包括gamma和alpha等对学习过程的影响：
  *      	a、令gamma=1后，效果非常好
  *      	b、q表初始化为0效果较随机初始化好
@@ -247,7 +247,7 @@ public:
 	}
 
 	double & qvalue(const State & state, int action) {
-		return qtable_[make_pair(state, action)];
+		return qtable_[boost::tuples::make_tuple(state, action)];
 	}
 
 	int plan(const State & state) {
@@ -311,8 +311,10 @@ public:
 
 private:
 	class Map {
+		typedef boost::tuples::tuple<State, int> state_action_pair_t;
+
 	public:
-		double & operator[](const pair<State, int> & key) {
+		double & operator[](const boost::tuples::tuple<State, int> & key) {
 			return map_[key]; //default initialized to zeros
 		}
 
@@ -320,8 +322,8 @@ private:
 			ofstream fout(file_name);
 
 			if (fout.good()) {
-				for (map<pair<State, int>, double>::const_iterator it = map_.begin(); it != map_.end(); ++it) {
-					fout << it->first.first << " " << it->first.second << " " << setprecision(13) << it->second << endl;
+				for (map<state_action_pair_t, double>::const_iterator it = map_.begin(); it != map_.end(); ++it) {
+					fout << it->first << " " << setprecision(13) << it->second << endl;
 				}
 			}
 
@@ -332,13 +334,12 @@ private:
 			ifstream fin(file_name);
 
 			if (fin.good()) {
-				State state;
-				int action;
+				state_action_pair_t state_action_pair;
 				double qvalue;
 
 				while (!fin.eof()) {
-					fin >> state >> action >> qvalue;
-					map_[make_pair(state, action)] = qvalue;
+					fin >> state_action_pair >> qvalue;
+					map_[state_action_pair] = qvalue;
 				}
 			}
 
@@ -346,7 +347,7 @@ private:
 		}
 
 	private:
-		map<pair<State, int>, double> map_;
+		map<state_action_pair_t, double> map_;
 	};
 
 	Map qtable_;
