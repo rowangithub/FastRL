@@ -5,15 +5,24 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/logger.cpp \
-../src/pole.cpp 
+../src/main.cpp \
+../src/pole.cpp \
+../src/qlearning.cpp \
+../src/system.cpp 
 
 OBJS += \
 ./src/logger.o \
-./src/pole.o 
+./src/main.o \
+./src/pole.o \
+./src/qlearning.o \
+./src/system.o 
 
 CPP_DEPS += \
 ./src/logger.d \
-./src/pole.d 
+./src/main.d \
+./src/pole.d \
+./src/qlearning.d \
+./src/system.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
