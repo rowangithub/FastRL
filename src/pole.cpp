@@ -30,8 +30,6 @@
 
 using namespace std;
 
-bool add_noise = true; //是否增加噪音
-
 static const double FLOAT_EPS = 1.0e-6;
 static const double one_degree = 2 * M_PI / 360.0;
 
@@ -116,9 +114,7 @@ public:
 
 		double force = (!action)? 0: ((action > 0)? FORCE_MAG : -FORCE_MAG);
 
-		if (add_noise) {
-			force += irand(-1.0, 1.0); //add some noise
-		}
+		force += irand(-1.0, 1.0); //动作误差
 
 		double costheta = cos(theta_);
 		double sintheta = sin(theta_);
@@ -434,20 +430,20 @@ private:
 
 void usage(const char *progname) {
 	cout << "Usage:\n\t" << progname << " [-t] [-s seed] [-d]\n"
-			<< "Options:\n" << "\t-t\ttest mode\n"
-			               << "\t-s\tset random seed\n"
-			               << "\t-d\tdo not add noise\n";
+			<< "Options:\n"
+			<< "\t-t\ttrain mode\n"
+			<< "\t-s\tset random seed\n"
+			;
 }
 
 int main(int argc, char **argv) {
 	int seed = getpid();
-	bool test = false;
+	bool train = false;
 
 	int  opt;
 	while ((opt = getopt(argc, argv, "dts:")) != -1) {
 		switch (opt) {
-		case 'd': add_noise = false; break;
-		case 't': test = true; break;
+		case 't': train = true; break;
 		case 's': seed = atoi(optarg); break;
 		default: usage(argv[0]); exit(1);
 		}
@@ -455,9 +451,9 @@ int main(int argc, char **argv) {
 
 	srand48(seed);
 
-	if (test) { //test
+	if (!train) { //test
 		QLearningAgent agent(-0.0, true);
-		Logger logger("animation.rcg");
+		Logger logger("cart-pole.rcg");
 		double reward = System().simulate(agent, true, & logger);
 		cout << "Reward: " << reward << endl;
 	}

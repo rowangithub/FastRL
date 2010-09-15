@@ -14,7 +14,7 @@ make
 mkdir $HISTORY
 
 for i in `seq 1 1024`; do
-    ./pole $* >>$DATA
+    ./pole -t $* >>$DATA
     cp $QTABLE $HISTORY/$QTABLE-$i
 done
 
