@@ -1,3 +1,3 @@
 #!/bin/bash
 
-uniplayer animation.rcg
+uniplayer cart-pole.rcg

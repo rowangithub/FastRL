@@ -114,7 +114,7 @@ public:
 
 		double force = (!action)? 0: ((action > 0)? FORCE_MAG : -FORCE_MAG);
 
-		force += irand(-1.0, 1.0); //动作误差
+		force += irand(-FORCE_MAG, FORCE_MAG) * 0.1; //动作误差
 
 		double costheta = cos(theta_);
 		double sintheta = sin(theta_);
