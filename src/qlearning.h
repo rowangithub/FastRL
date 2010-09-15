@@ -24,7 +24,7 @@
  */
 class QLearningAgent: public RandomAgent {
 private:
-	static const double epsilon_ = 0.9;
+	static const double epsilon_ = 0.1;
 	static const double alpha = 0.5;
 	static const double gamma = 1.0 - 1.0e-6;
 
