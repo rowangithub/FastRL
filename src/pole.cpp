@@ -74,6 +74,46 @@ private:
 	boost::tuples::tuple<int, int, int> data_;
 };
 
+class QTable {
+	typedef boost::tuples::tuple<State, int> state_action_pair_t;
+
+public:
+	double & operator[](const boost::tuples::tuple<State, int> & key) {
+		return table_[key]; //default initialized to zeros
+	}
+
+	void save(const char *file_name) const {
+		ofstream fout(file_name);
+
+		if (fout.good()) {
+			for (map<state_action_pair_t, double>::const_iterator it = table_.begin(); it != table_.end(); ++it) {
+				fout << it->first << " " << setprecision(13) << it->second << endl;
+			}
+		}
+
+		fout.close();
+	}
+
+	void load(const char *file_name) {
+		ifstream fin(file_name);
+
+		if (fin.good()) {
+			state_action_pair_t state_action_pair;
+			double qvalue;
+
+			while (!fin.eof()) {
+				fin >> state_action_pair >> qvalue;
+				table_[state_action_pair] = qvalue;
+			}
+		}
+
+		fin.close();
+	}
+
+private:
+	map<state_action_pair_t, double> table_;
+};
+
 class Pole {
 public:
 	Pole() {
@@ -306,47 +346,7 @@ public:
 	}
 
 private:
-	class Map {
-		typedef boost::tuples::tuple<State, int> state_action_pair_t;
-
-	public:
-		double & operator[](const boost::tuples::tuple<State, int> & key) {
-			return map_[key]; //default initialized to zeros
-		}
-
-		void save(const char *file_name) const {
-			ofstream fout(file_name);
-
-			if (fout.good()) {
-				for (map<state_action_pair_t, double>::const_iterator it = map_.begin(); it != map_.end(); ++it) {
-					fout << it->first << " " << setprecision(13) << it->second << endl;
-				}
-			}
-
-			fout.close();
-		}
-
-		void load(const char *file_name) {
-			ifstream fin(file_name);
-
-			if (fin.good()) {
-				state_action_pair_t state_action_pair;
-				double qvalue;
-
-				while (!fin.eof()) {
-					fin >> state_action_pair >> qvalue;
-					map_[state_action_pair] = qvalue;
-				}
-			}
-
-			fin.close();
-		}
-
-	private:
-		map<state_action_pair_t, double> map_;
-	};
-
-	Map qtable_;
+	QTable qtable_;
 	const double epsilon_;
 	const bool test_;
 };
