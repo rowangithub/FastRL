@@ -1,6 +1,5 @@
 #!/bin/bash 
 
-OUTPUT="learning-curve.txt"
 OPT="$1"
 DIR="$2"
 
@@ -19,6 +18,8 @@ if [ -z $DIR ]; then
     usage
     exit
 fi
+
+OUTPUT="learning-curve$1.txt"
 
 cd $DIR
 rm -f $OUTPUT
