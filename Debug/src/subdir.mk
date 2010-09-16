@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
+../src/epsilon-agent.cpp \
 ../src/logger.cpp \
 ../src/main.cpp \
 ../src/monte-carlo.cpp \
@@ -12,6 +13,7 @@ CPP_SRCS += \
 ../src/system.cpp 
 
 OBJS += \
+./src/epsilon-agent.o \
 ./src/logger.o \
 ./src/main.o \
 ./src/monte-carlo.o \
@@ -20,6 +22,7 @@ OBJS += \
 ./src/system.o 
 
 CPP_DEPS += \
+./src/epsilon-agent.d \
 ./src/logger.d \
 ./src/main.d \
 ./src/monte-carlo.d \

@@ -8,48 +8,35 @@
 #ifndef QLEARNING_H_
 #define QLEARNING_H_
 
-#include "agent.h"
-
-#include <iostream>
-#include<fstream>
-#include <cmath>
-#include <iomanip>
-#include <algorithm>
-#include <cassert>
-
-#include "qtable.h"
+#include "table.h"
+#include "epsilon-agent.h"
 
 /**
- * Model-free QLearning Agent
+ * QLearning method
  */
-class QLearningAgent: public RandomAgent {
+class QLearningAgent: public EpsilonAgent {
 private:
-	static const double epsilon_ = 0.1;
 	static const double alpha = 0.5;
 	static const double gamma = 1.0 - 1.0e-6;
 
 public:
-	QLearningAgent(const bool test): RandomAgent(test) {
-		qtable_.load("qtable.txt");
+	QLearningAgent(const bool test): EpsilonAgent(test) {
+		qtable_.load("q-learning.txt");
 	}
 
 	virtual ~QLearningAgent() {
 		if (!test()) {
-			qtable_.save("qtable.txt");
+			qtable_.save("q-learning.txt");
 		}
 	}
 
-	virtual int plan(const State & state);
+	double & qvalue(const State &, const int &);
+
 	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state);
 	virtual void fail(const State & state, int action, double reward);
 
-	int greedy(const State & state);
-
-public:
-	QTable & qtable() { return qtable_; }
-
 private:
-	QTable qtable_;
+	StateActionPairTable<double> qtable_;
 };
 
 
