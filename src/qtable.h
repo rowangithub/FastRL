@@ -17,11 +17,11 @@ template<class DataType>
 class StateActionPairTable: public AutoTable<state_action_pair_t, DataType> {
 public:
 	DataType & operator[](const state_action_pair_t & state_action_pair) {
-		return AutoTable<state_action_pair_t, DataType>::table()[state_action_pair];
+		return this->table()[state_action_pair];
 	}
 
 	DataType & operator()(const State & state, int action) {
-		return AutoTable<state_action_pair_t, DataType>::table()[boost::tuples::make_tuple(state, action)];
+		return this->table()[boost::tuples::make_tuple(state, action)];
 	}
 };
 
