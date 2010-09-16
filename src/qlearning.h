@@ -5,28 +5,28 @@
  *      Author: baj
  */
 
-#ifndef SARSA_H_
-#define SARSA_H_
+#ifndef QLEARNING_H_
+#define QLEARNING_H_
 
 #include "table.h"
 #include "epsilon-agent.h"
 
 /**
- * Sarsa method
+ * Q-learning method
  */
-class SarsaAgent: public EpsilonAgent {
+class QLearningAgent: public EpsilonAgent {
 private:
 	static const double alpha = 0.5;
 	static const double gamma = 1.0 - 1.0e-6;
 
 public:
-	SarsaAgent(const bool test): EpsilonAgent(test) {
-		qtable_.load("sarsa.txt");
+	QLearningAgent(const bool test): EpsilonAgent(test) {
+		qtable_.load("qlearning.txt");
 	}
 
-	virtual ~SarsaAgent() {
+	virtual ~QLearningAgent() {
 		if (!test()) {
-			qtable_.save("sarsa.txt");
+			qtable_.save("qlearning.txt");
 		}
 	}
 

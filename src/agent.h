@@ -13,7 +13,8 @@ class State;
 enum AgentType {
 	AT_None,
 	AT_MonteCarlo,
-	AT_Sarsa
+	AT_Sarsa,
+	AT_QLearning
 };
 
 class Agent {
