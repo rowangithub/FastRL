@@ -32,8 +32,6 @@ public:
 
 public:
 	virtual double & qvalue(const State &, const int &) = 0;
-
-private:
 };
 
 #endif /* EPSILON_AGENT_H_ */

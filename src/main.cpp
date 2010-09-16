@@ -30,6 +30,12 @@ Agent *CreatorAgent(AgentType agent_t, bool train)
 	}
 }
 
+void set_random_seed(int seed)
+{
+	srand(seed);
+	srand48(seed);
+}
+
 void usage(const char *progname) {
 	cerr << "Usage:\n\t" << progname << " [-t] [-s seed] [-d]\n"
 			<< "Options:\n"
@@ -56,7 +62,7 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	srand48(seed);
+	set_random_seed(seed);
 
 	Agent *agent = CreatorAgent(agent_t, train);
 

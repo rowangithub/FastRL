@@ -32,7 +32,6 @@ int EpsilonAgent::plan(const State & state)
 	}
 }
 
-
 int EpsilonAgent::greedy(const State & state)
 {
 	std::vector<int> actions;
@@ -51,7 +50,7 @@ int EpsilonAgent::greedy(const State & state)
 	}
 
 	if (!actions.empty()) {
-		random_shuffle(actions.begin(), actions.end());
+		std::random_shuffle(actions.begin(), actions.end());
 		return actions.front();
 	}
 	else {
