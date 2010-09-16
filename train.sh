@@ -1,10 +1,6 @@
 #!/bin/bash 
 
-HISTORY="history"
-QTABLE="qtable.txt"
-VISITS="visits.txt"
-DATA="pp"
-
+OUTPUT="learning-curve.txt"
 DIR="$1"
 
 if [ -z $DIR ]; then
@@ -13,13 +9,10 @@ if [ -z $DIR ]; then
     exit
 fi
 
-rm -f $QTABLE
-rm -fr $HISTORY
-rm -f $DATA
-
-mkdir $HISTORY
+cd $DIR
+rm -f $OUTPUT
 
 for i in `seq 1 1024`; do
-    ./pole -t $* >>$DATA
+    ./pole -t $* >>$OUTPUT
 done
 
