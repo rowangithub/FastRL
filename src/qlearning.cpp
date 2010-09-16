@@ -13,12 +13,10 @@ double & QLearningAgent::qvalue(const State & state, const int & action)
 	return qtable_(state, action);
 }
 
-void QLearningAgent::learn(const State & state, int action, double reward, const State & post_state, int post_action)
+void QLearningAgent::learn(const State & state, int action, double reward, const State & post_state, int)
 {
-	post_action = greedy(post_action); //use greedy-policy action
-
 	double & u = qtable_(state, action);
-	const double & v = qtable_(post_state, post_action);
+	const double & v = qtable_(post_state, greedy(post_state));
 
 	u += alpha * (reward + gamma * v - u);
 }

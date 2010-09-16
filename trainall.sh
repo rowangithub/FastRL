@@ -12,6 +12,8 @@ if [ -z $DIR ]; then
     exit
 fi
 
+./clear.sh
+
 cd $DIR
 make clean
 make
