@@ -12,8 +12,8 @@ class State;
 
 enum AgentType {
 	AT_None,
-	AT_QLearning,
-	AT_MonteCarlo
+	AT_MonteCarlo,
+	AT_Sarsa
 };
 
 class Agent {
@@ -25,8 +25,8 @@ public:
 	virtual ~Agent() { }
 
 	virtual int plan(const State &) = 0;
-	virtual void learn(const State &, int, double, const State &) = 0;
-	virtual void fail(const State &, int, double) = 0;
+	virtual void learn(const State &, int, double, const State &, int) { } //learning from full quintuple
+	virtual void fail(const State &, int, double) { } //inform the agent about failure
 
 	const bool & test() const { return test_; }
 

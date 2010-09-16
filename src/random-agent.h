@@ -22,8 +22,6 @@ public:
 	virtual ~RandomAgent() { }
 
 	virtual int plan(const State &);
-	virtual void learn(const State &, int, double, const State &) { }
-	virtual void fail(const State &, int, double) { }
 };
 
 

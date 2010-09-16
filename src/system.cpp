@@ -18,11 +18,12 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 {
 	int step = 0;
 	double rewards = 0.0;
+
 	State state = pole_.get_signal<State>();
+	int action = agent.plan(state);
 
 	do {
 		step += 1;
-		int action = agent.plan(state);
 
 		if (verbose) {
 			pole_.print_state(step);
@@ -34,10 +35,10 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 			logger->Flush();
 		}
 
-		pole_.step(action);
+		pole_.step(action); //taking action
 
 		if (pole_.fail()) {
-			agent.fail(state, action, get_terminal_reward()); //failure state - 区别失败状态跟一般未知状态（未知状态初始化为零）
+			agent.fail(state, action, get_failure_reward()); //failure state - 区别失败状态跟一般未知状态（未知状态初始化为零）
 			if (verbose) {
 				cout << " | Failure" << endl;
 			}
@@ -45,10 +46,14 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 			break;
 		}
 
-		State post_state = pole_.get_signal<State>();
-		double reward = get_reward(action);
-		agent.learn(state, action, reward, post_state);
+		State post_state = pole_.get_signal<State>(); //observing s'
+		double reward = get_reward(action); //observing reward
+		int post_action = agent.plan(post_state); //choosing a'
+
+		agent.learn(state, action, reward, post_state, post_action); //learning from experience
+
 		state = post_state;
+		action = post_action;
 
 		if (verbose) {
 			cout << " | Reward: " << reward << endl;

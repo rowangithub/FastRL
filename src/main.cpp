@@ -2,7 +2,7 @@
 #include "logger.h"
 #include "system.h"
 #include "agent.h"
-#include "qlearning.h"
+#include "sarsa.h"
 #include "monte-carlo.h"
 
 /**
@@ -24,8 +24,8 @@ using namespace std;
 Agent *CreatorAgent(AgentType agent_t, bool train)
 {
 	switch (agent_t) {
-	case AT_QLearning: return new QLearningAgent(!train);
 	case AT_MonteCarlo: return new MonteCarloAgent(!train);
+	case AT_Sarsa: return new SarsaAgent(!train);
 	default: return 0;
 	}
 }
@@ -37,32 +37,29 @@ void set_random_seed(int seed)
 }
 
 void usage(const char *progname) {
-	cerr << "Usage:\n\t" << progname << " [-t] [-s seed] [-d]\n"
+	cerr << "Usage:\n\t" << progname << " [-t|s|m]\n"
 			<< "Options:\n"
 			<< "\t-t\ttrain mode\n"
-			<< "\t-s\tset random seed\n"
-			<< "\t-q\tuse q-learning method\n"
+			<< "\t-s\tuse sarsa method\n"
 			<< "\t-m\tuse monte-carlo method\n"
 			;
 }
 
 int main(int argc, char **argv) {
-	int seed = getpid();
 	bool train = false;
 	AgentType agent_t = AT_None;
 
 	int  opt;
-	while ((opt = getopt(argc, argv, "qmts:")) != -1) {
+	while ((opt = getopt(argc, argv, "tsm")) != -1) {
 		switch (opt) {
 		case 't': train = true; break;
-		case 'q': agent_t = AT_QLearning; break;
+		case 's': agent_t = AT_Sarsa; break;
 		case 'm': agent_t = AT_MonteCarlo; break;
-		case 's': seed = atoi(optarg); break;
 		default: usage(argv[0]); exit(1);
 		}
 	}
 
-	set_random_seed(seed);
+	set_random_seed(getpid());
 
 	Agent *agent = CreatorAgent(agent_t, train);
 
