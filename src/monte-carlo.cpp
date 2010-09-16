@@ -6,6 +6,7 @@
  */
 
 #include <set>
+#include <iostream>
 
 #include "monte-carlo.h"
 

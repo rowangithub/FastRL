@@ -12,7 +12,7 @@
 #include "epsilon-agent.h"
 
 /**
- * QLearning method
+ * Q-learning method
  */
 class QLearningAgent: public EpsilonAgent {
 private:

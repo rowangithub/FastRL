@@ -10,8 +10,6 @@
 
 #include "random-agent.h"
 
-class QTable;
-
 class EpsilonAgent: public RandomAgent {
 private:
 	static const double epsilon_ = 0.1;
