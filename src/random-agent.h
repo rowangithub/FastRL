@@ -21,22 +21,7 @@ public:
 
 	virtual ~RandomAgent() { }
 
-	virtual int plan(const State &) {
-		double p = prob();
-
-		if (p < 1 / 3.0) {
-			return -1;
-		}
-		else if (p > 2 / 3.0) {
-			return 1;
-		}
-		else {
-			return 0;
-		}
-	}
-
-	virtual void learn(const State &, int, double, const State &) { }
-	virtual void fail(const State &, int, double) { }
+	virtual int plan(const State &);
 };
 
 

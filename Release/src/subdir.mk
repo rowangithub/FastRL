@@ -10,6 +10,7 @@ CPP_SRCS += \
 ../src/monte-carlo.cpp \
 ../src/pole.cpp \
 ../src/qlearning.cpp \
+../src/random-agent.cpp \
 ../src/system.cpp 
 
 OBJS += \
@@ -19,6 +20,7 @@ OBJS += \
 ./src/monte-carlo.o \
 ./src/pole.o \
 ./src/qlearning.o \
+./src/random-agent.o \
 ./src/system.o 
 
 CPP_DEPS += \
@@ -28,6 +30,7 @@ CPP_DEPS += \
 ./src/monte-carlo.d \
 ./src/pole.d \
 ./src/qlearning.d \
+./src/random-agent.d \
 ./src/system.d 
 
 

@@ -12,27 +12,27 @@
 #include "epsilon-agent.h"
 
 /**
- * QLearning method
+ * Q-learning method
  */
-class QLearningAgent: public EpsilonAgent {
+class SarsaAgent: public EpsilonAgent {
 private:
 	static const double alpha = 0.5;
 	static const double gamma = 1.0 - 1.0e-6;
 
 public:
-	QLearningAgent(const bool test): EpsilonAgent(test) {
-		qtable_.load("q-learning.txt");
+	SarsaAgent(const bool test): EpsilonAgent(test) {
+		qtable_.load("sarsa.txt");
 	}
 
-	virtual ~QLearningAgent() {
+	virtual ~SarsaAgent() {
 		if (!test()) {
-			qtable_.save("q-learning.txt");
+			qtable_.save("sarsa.txt");
 		}
 	}
 
 	double & qvalue(const State &, const int &);
 
-	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state);
+	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state, int);
 	virtual void fail(const State & state, int action, double reward);
 
 private:

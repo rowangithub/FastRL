@@ -10,8 +10,6 @@
 
 #include "random-agent.h"
 
-class QTable;
-
 class EpsilonAgent: public RandomAgent {
 private:
 	static const double epsilon_ = 0.1;
@@ -26,9 +24,6 @@ public:
 
 	virtual int plan(const State & state);
 	int greedy(const State & state);
-
-	virtual void learn(const State &, int, double, const State &) { }
-	virtual void fail(const State &, int, double) { }
 
 public:
 	virtual double & qvalue(const State &, const int &) = 0;
