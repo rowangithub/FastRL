@@ -3,6 +3,9 @@
 OPT="$1"
 DIR="$2"
 
+CON="true" #true/false
+NUM="5120"
+
 usage() {
     echo "Usage: $0 [-q|-m] [dir]"
 }
@@ -22,9 +25,12 @@ fi
 OUTPUT="learning-curve$1.txt"
 
 cd $DIR
-rm -f $OUTPUT
 
-for i in `seq 1 1024`; do
+if [ $CON = "false" ]; then
+    rm -f $OUTPUT
+fi
+
+for i in `seq 1 $NUM`; do
     ./pole -t $OPT >>$OUTPUT
 done
 
