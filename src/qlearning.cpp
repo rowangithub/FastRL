@@ -8,13 +8,23 @@
 #include "utils.h"
 #include "qlearning.h"
 
+/**
+ * epsilon-greedy policy
+ * @param state
+ * @return
+ */
 int QLearningAgent::plan(const State & state)
 {
-	if (drand48() < epsilon_) {
-		return RandomAgent::plan(state);
+	if (test()) {
+		return greedy(state);
 	}
 	else {
-		return greedy(state);
+		if (prob() < epsilon_) {
+			return RandomAgent::plan(state);
+		}
+		else {
+			return greedy(state);
+		}
 	}
 }
 

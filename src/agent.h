@@ -10,6 +10,8 @@
 
 #include <cstdlib>
 
+#include "utils.h"
+
 class State;
 
 enum AgentType {
@@ -45,12 +47,12 @@ public:
 	virtual ~RandomAgent() { }
 
 	virtual int plan(const State &) {
-		double prob = drand48();
+		double p = prob();
 
-		if (prob < 1 / 3.0) {
+		if (p < 1 / 3.0) {
 			return -1;
 		}
-		else if (prob > 2 / 3.0) {
+		else if (p > 2 / 3.0) {
 			return 1;
 		}
 		else {

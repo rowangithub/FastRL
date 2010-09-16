@@ -19,5 +19,9 @@ inline double irand(const double & min, const double & max)
 	return min + (max - min) * drand48();
 }
 
+inline double prob()
+{
+	return drand48();
+}
 
 #endif /* UTILS_H_ */
