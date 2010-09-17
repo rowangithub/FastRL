@@ -10,6 +10,9 @@
 
 #include "random-agent.h"
 
+/**
+ * epsilon-greedy method
+ */
 class EpsilonAgent: public RandomAgent {
 private:
 	static const double epsilon_ = 0.1;

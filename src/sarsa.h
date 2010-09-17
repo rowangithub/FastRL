@@ -12,7 +12,7 @@
 #include "epsilon-agent.h"
 
 /**
- * Sarsa method
+ * on-policy Sarsa method
  */
 class SarsaAgent: public EpsilonAgent {
 private:
