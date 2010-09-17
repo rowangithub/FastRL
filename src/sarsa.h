@@ -16,7 +16,7 @@
  */
 class SarsaAgent: public EpsilonAgent {
 private:
-	static const double alpha = 0.5;
+	static const double alpha = 0.25;
 	static const double gamma = 1.0 - 1.0e-6;
 
 public:
