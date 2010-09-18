@@ -9,18 +9,14 @@
 #define SARSA_H_
 
 #include "table.h"
-#include "epsilon-agent.h"
+#include "td-agent.h"
 
 /**
  * on-policy Sarsa method
  */
-class SarsaAgent: public EpsilonAgent {
-private:
-	static const double alpha = 0.25;
-	static const double gamma = 1.0 - 1.0e-6;
-
+class SarsaAgent: public TDAgent {
 public:
-	SarsaAgent(const bool test): EpsilonAgent(test) {
+	SarsaAgent(const bool test): TDAgent(test) {
 		qtable_.load("sarsa.txt");
 	}
 

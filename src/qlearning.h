@@ -9,18 +9,14 @@
 #define QLEARNING_H_
 
 #include "table.h"
-#include "epsilon-agent.h"
+#include "td-agent.h"
 
 /**
  * off-policy Q-learning method
  */
-class QLearningAgent: public EpsilonAgent {
-private:
-	static const double alpha = 0.25;
-	static const double gamma = 1.0 - 1.0e-6;
-
+class QLearningAgent: public TDAgent {
 public:
-	QLearningAgent(const bool test): EpsilonAgent(test) {
+	QLearningAgent(const bool test): TDAgent(test) {
 		qtable_.load("qlearning.txt");
 	}
 
