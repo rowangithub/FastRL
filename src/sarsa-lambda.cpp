@@ -58,11 +58,14 @@ void SarsaLambdaAgent::learn(const State & state, int action, double reward, con
 
 		if (sa.get<0>() == state && sa.get<1>() != action) { //set to be zero
 			e = 0.0;
-			zeros.insert(sa);
 		}
-		else {
+
+		if (e > min_eligibility) {
 			qvalue(sa) += alpha * delta * e;
 			e *= gamma * lambda; //normal decay
+		}
+		else {
+			zeros.insert(sa);
 		}
 	}
 

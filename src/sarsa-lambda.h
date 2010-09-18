@@ -19,6 +19,7 @@
 class SarsaLambdaAgent: public TemporalDifferenceAgent {
 private:
 	static const double lambda = 0.8;
+	static const double min_eligibility = 1.0e-3;
 
 public:
 	SarsaLambdaAgent(const bool test);
