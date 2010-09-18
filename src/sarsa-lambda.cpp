@@ -34,25 +34,17 @@ double & SarsaLambdaAgent::qvalue(const state_action_pair_t & state_action)
 	return qtable_[state_action];
 }
 
-double & SarsaLambdaAgent::eligibility(const state_action_pair_t & state_action)
-{
-	return eligibility_[state_action];
-}
-
-void SarsaLambdaAgent::learn(const State & state, int action, double reward, const State & post_state, int post_action)
+void SarsaLambdaAgent::learn(const State & state, int action, double reward, double bootstrap)
 {
 	state_action_pair_t state_action = boost::tuples::make_tuple(state, action);
-
 	const double & u = qvalue(state, action);
-	const double & v = qvalue(post_state, post_action);
 
-	const double delta = reward + gamma * v - u;
-	double & e = eligibility(state_action);
+	const double delta = reward + gamma * bootstrap - u;
 
-	e += 1.0;
+	eligibility_trace_[state_action] += 1.0;
 
 	std::set<state_action_pair_t> zeros;
-	for (std::map<state_action_pair_t, double>::iterator it = eligibility_.begin(); it != eligibility_.end(); ++it) {
+	for (std::map<state_action_pair_t, double>::iterator it = eligibility_trace_.begin(); it != eligibility_trace_.end(); ++it) {
 		double & e = it->second;
 		const state_action_pair_t & sa = it->first;
 
@@ -70,12 +62,18 @@ void SarsaLambdaAgent::learn(const State & state, int action, double reward, con
 	}
 
 	for (std::set<state_action_pair_t>::iterator it = zeros.begin(); it != zeros.end(); ++it) {
-		eligibility_.erase(*it);
+		eligibility_trace_.erase(*it);
 	}
+}
+
+void SarsaLambdaAgent::learn(const State & state, int action, double reward, const State & post_state, int post_action)
+{
+	learn(state, action, reward, qvalue(post_state, post_action));
 }
 
 void SarsaLambdaAgent::fail(const State & state, int action, double reward)
 {
-	qvalue(state, action) = reward;
-	eligibility_.clear(); //prepare for new episode
+	learn(state, action, reward, 0.0);
+
+	eligibility_trace_.clear(); //prepare for new episode
 }

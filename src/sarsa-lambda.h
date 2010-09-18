@@ -32,11 +32,11 @@ public:
 
 private:
 	double & qvalue(const state_action_pair_t &);
-	double & eligibility(const state_action_pair_t &);
+	void learn(const State & pre_state, int pre_action, double reward, double bootstrap);
 
 private:
 	StateActionPairTable<double> qtable_;
-	StateActionPairTable<double> eligibility_;
+	StateActionPairTable<double> eligibility_trace_;
 };
 
 
