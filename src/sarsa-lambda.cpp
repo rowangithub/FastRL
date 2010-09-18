@@ -41,22 +41,17 @@ void SarsaLambdaAgent::learn(const State & state, int action, double reward, dou
 
 	const double delta = reward + gamma * bootstrap - u;
 
-	eligibility_trace_[state_action] += 1.0;
+	eligibility_trace_[state_action] = 1.0;
 
 	std::set<state_action_pair_t> zeros;
 	for (std::map<state_action_pair_t, double>::iterator it = eligibility_trace_.begin(); it != eligibility_trace_.end(); ++it) {
 		double & e = it->second;
 		const state_action_pair_t & sa = it->first;
 
-		if (sa.get<0>() == state && sa.get<1>() != action) { //set to be zero
-			e = 0.0;
-		}
+		qvalue(sa) += alpha * delta * e;
+		e *= gamma * lambda; //eligibility decay
 
-		if (e > min_eligibility) {
-			qvalue(sa) += alpha * delta * e;
-			e *= gamma * lambda; //normal decay
-		}
-		else {
+		if (e < min_eligibility) {
 			zeros.insert(sa);
 		}
 	}
