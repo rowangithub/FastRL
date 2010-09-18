@@ -32,7 +32,7 @@ public:
 
 private:
 	double & qvalue(const state_action_pair_t &);
-	void learn(const State & pre_state, int pre_action, double reward, double bootstrap);
+	void backup(const State & pre_state, int pre_action, double reward, double bootstrap);
 
 private:
 	StateActionPairTable<double> qtable_;

@@ -34,7 +34,7 @@ double & SarsaLambdaAgent::qvalue(const state_action_pair_t & state_action)
 	return qtable_[state_action];
 }
 
-void SarsaLambdaAgent::learn(const State & state, int action, double reward, double bootstrap)
+void SarsaLambdaAgent::backup(const State & state, int action, double reward, double bootstrap)
 {
 	state_action_pair_t state_action = boost::tuples::make_tuple(state, action);
 	const double & u = qvalue(state, action);
@@ -63,12 +63,12 @@ void SarsaLambdaAgent::learn(const State & state, int action, double reward, dou
 
 void SarsaLambdaAgent::learn(const State & state, int action, double reward, const State & post_state, int post_action)
 {
-	learn(state, action, reward, qvalue(post_state, post_action));
+	backup(state, action, reward, qvalue(post_state, post_action));
 }
 
 void SarsaLambdaAgent::fail(const State & state, int action, double reward)
 {
-	learn(state, action, reward, 0.0);
+	backup(state, action, reward, 0.0);
 
 	eligibility_trace_.clear(); //prepare for new episode
 }
