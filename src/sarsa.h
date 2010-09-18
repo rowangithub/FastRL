@@ -14,9 +14,9 @@
 /**
  * on-policy Sarsa method
  */
-class SarsaAgent: public TDAgent {
+class SarsaAgent: public TemporalDifferenceAgent {
 public:
-	SarsaAgent(const bool test): TDAgent(test) {
+	SarsaAgent(const bool test): TemporalDifferenceAgent(test) {
 		qtable_.load("sarsa.txt");
 	}
 

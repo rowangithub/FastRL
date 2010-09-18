@@ -14,9 +14,9 @@
 /**
  * off-policy Q-learning method
  */
-class QLearningAgent: public TDAgent {
+class QLearningAgent: public TemporalDifferenceAgent {
 public:
-	QLearningAgent(const bool test): TDAgent(test) {
+	QLearningAgent(const bool test): TemporalDifferenceAgent(test) {
 		qtable_.load("qlearning.txt");
 	}
 
