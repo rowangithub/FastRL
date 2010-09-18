@@ -15,7 +15,7 @@
  */
 class TemporalDifferenceAgent: public EpsilonAgent {
 public:
-	static const double alpha = 0.15; //learning rate - which is somehow good according to experimental resutls
+	static const double alpha = 0.15; //learning rate - which is somehow good according to empirical resutls
 	static const double gamma = 1.0 - 1.0e-6; //constant step parameter
 
 public:
