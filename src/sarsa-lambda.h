@@ -8,7 +8,7 @@
 #ifndef SARSALAMBDA_H_
 #define SARSALAMBDA_H_
 
-#include <set>
+#include <list>
 
 #include "table.h"
 #include "td-agent.h"
@@ -19,7 +19,6 @@
 class SarsaLambdaAgent: public TemporalDifferenceAgent {
 private:
 	static const double lambda = 0.8;
-	static const double min_eligibility = 1.0e-3;
 
 public:
 	SarsaLambdaAgent(const bool test);
@@ -35,8 +34,8 @@ private:
 	double & eligibility(const state_action_pair_t &);
 
 private:
-	StateActionPairTable<boost::tuples::tuple<double, double> > sarsa_lambda_;
-	std::set<state_action_pair_t> nonzero_state_action_;
+	StateActionPairTable<double> qtable_;
+	StateActionPairTable<double> eligibility_;
 };
 
 

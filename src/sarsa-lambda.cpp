@@ -7,42 +7,36 @@
 
 #include <cassert>
 #include <iostream>
+#include <set>
 
 #include "utils.h"
 #include "sarsa-lambda.h"
 
 SarsaLambdaAgent::SarsaLambdaAgent(const bool test): TemporalDifferenceAgent(test)
 {
-	sarsa_lambda_.load("sarsa-lambda.txt");
-
-	std::map<state_action_pair_t, boost::tuples::tuple<double, double> >::iterator it = sarsa_lambda_.table().begin();
-	for (; it != sarsa_lambda_.table().end(); ++it) {
-		if (it->second.get<1>() >= min_eligibility) {
-			nonzero_state_action_.insert(it->first);
-		}
-	}
+	qtable_.load("sarsa-lambda.txt");
 }
 
 SarsaLambdaAgent::~SarsaLambdaAgent()
 {
 	if (!test()) {
-		sarsa_lambda_.save("sarsa-lambda.txt");
+		qtable_.save("sarsa-lambda.txt");
 	}
 }
 
 double & SarsaLambdaAgent::qvalue(const State & state, const int & action)
 {
-	return sarsa_lambda_(state, action).get<0>();
+	return qtable_(state, action);
 }
 
 double & SarsaLambdaAgent::qvalue(const state_action_pair_t & state_action)
 {
-	return sarsa_lambda_[state_action].get<0>();
+	return qtable_[state_action];
 }
 
-double & SarsaLambdaAgent::eligibility(const state_action_pair_t &state_action)
+double & SarsaLambdaAgent::eligibility(const state_action_pair_t & state_action)
 {
-	return sarsa_lambda_[state_action].get<1>();
+	return eligibility_[state_action];
 }
 
 void SarsaLambdaAgent::learn(const State & state, int action, double reward, const State & post_state, int post_action)
@@ -57,31 +51,28 @@ void SarsaLambdaAgent::learn(const State & state, int action, double reward, con
 
 	e += 1.0;
 
-	nonzero_state_action_.insert(state_action);
-	std::set<state_action_pair_t> zero_state_action_;
+	std::set<state_action_pair_t> zeros;
+	for (std::map<state_action_pair_t, double>::iterator it = eligibility_.begin(); it != eligibility_.end(); ++it) {
+		double & e = it->second;
+		const state_action_pair_t & sa = it->first;
 
-	for (std::set<state_action_pair_t>::iterator it = nonzero_state_action_.begin(); it != nonzero_state_action_.end(); ++it) {
-		double & e = eligibility(*it);
-
-		if (it->get<0>() == state && it->get<1>() != action) { //set to be zero
+		if (sa.get<0>() == state && sa.get<1>() != action) { //set to be zero
 			e = 0.0;
-		}
-
-		if (e >= min_eligibility) {
-			qvalue(*it) += alpha * delta * e;
-			e *= gamma * lambda; //normal decay
+			zeros.insert(sa);
 		}
 		else {
-			zero_state_action_.insert(*it);
+			qvalue(sa) += alpha * delta * e;
+			e *= gamma * lambda; //normal decay
 		}
 	}
 
-	for (std::set<state_action_pair_t>::iterator it = zero_state_action_.begin(); it != zero_state_action_.end(); ++it) {
-		nonzero_state_action_.erase(*it);
+	for (std::set<state_action_pair_t>::iterator it = zeros.begin(); it != zeros.end(); ++it) {
+		eligibility_.erase(*it);
 	}
 }
 
 void SarsaLambdaAgent::fail(const State & state, int action, double reward)
 {
 	qvalue(state, action) = reward;
+	eligibility_.clear(); //prepare for new episode
 }
