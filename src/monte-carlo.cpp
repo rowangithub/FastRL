@@ -12,7 +12,7 @@
 
 double & MonteCarloAgent::qvalue(const State & state, const int & action)
 {
-	return monte_carlo_(state, action).get<0>();
+	return monte_carlo_[state][action].get<0>();
 }
 
 void MonteCarloAgent::learn(const State & state, int action, double reward, const State &, int)
@@ -47,7 +47,7 @@ void MonteCarloAgent::fail(const State & state, int action, double reward)
 		for (; it != history_.end(); ++it) {
 			if (visited.count(it->first)) continue; //should be first visit!
 
-			boost::tuples::tuple<double, u_int64_t> & tuple = monte_carlo_[it->first];
+			boost::tuples::tuple<double, u_int64_t> & tuple = monte_carlo_(it->first);
 
 			double & q = tuple.get<0>();
 			u_int64_t & n = tuple.get<1>();
