@@ -17,10 +17,11 @@ class State: public boost::tuples::tuple<int, int, int> {
 public:
 	State() { }
 
-	State(const double & dx, const double & theta, const double & dtheta) {
-		get<0>() = dx * 100.0; //精确到厘米
-		get<1>() = theta / one_degree; //精确到一度
-		get<2>() = dtheta / one_degree; //精确到一度
+	State(const int & a, const int & b, const int & c): boost::tuples::tuple<int, int, int>(a, b, c) {
+	}
+
+	State operator-() const {
+		return State(-get<0>(), -get<1>(), -get<2>());
 	}
 };
 

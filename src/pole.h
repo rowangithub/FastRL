@@ -49,7 +49,7 @@ public:
 	 */
 	template<class State>
 	State get_signal() {
-		return State(dx_, theta_, dtheta_);
+		return State(dx_ * 100.0, theta_ / one_degree, dtheta_ / one_degree);
 	}
 
 	void print_state(int step) {
