@@ -12,7 +12,7 @@
 
 double & MonteCarloAgent::qvalue(const State & state, const int & action)
 {
-	return monte_carlo_[state][action].get<0>();
+	return monte_carlo_(state, action).get<0>();
 }
 
 void MonteCarloAgent::learn(const State & state, int action, double reward, const State &, int)

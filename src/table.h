@@ -89,7 +89,7 @@ public:
 	}
 
 	DataType & operator()(const state_action_pair_t & pair) {
-		return this->operator[](pair.get<0>())[pair.get<1>()];
+		return this->operator()(pair.get<0>(), pair.get<1>());
 	}
 };
 
