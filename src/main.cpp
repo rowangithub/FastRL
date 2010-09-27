@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 			rewards += System().simulate(*agent, false);
 		} while(loops--);
 
-		cout << "#Avg Reward:\n" << rewards / double(episodes) << endl;
+		cout << rewards / double(episodes) << endl;
 	}
 
 	delete agent;

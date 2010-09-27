@@ -3,7 +3,6 @@
 OPT="$1"
 DIR="$2"
 
-CON="true" #true/false
 NUM="5120"
 
 usage() {
@@ -23,14 +22,13 @@ if [ -z $DIR ]; then
 fi
 
 OUTPUT="learning-curve$1.txt"
+BEGIN=`date +'%s'`
 
 cd $DIR
-
-if [ $CON = "false" ]; then
-    rm -f $OUTPUT
-fi
-
 for i in `seq 1 $NUM`; do
-    ./pole -t $OPT >>$OUTPUT
+    REWARD=`./pole -t $OPT`
+    TIME=`date +'%s'`
+    echo $i `expr $TIME - $BEGIN` $REWARD >>$OUTPUT
+    sleep 1
 done
 
