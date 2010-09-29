@@ -5,6 +5,7 @@
 #include "monte-carlo.h"
 #include "sarsa.h"
 #include "qlearning.h"
+#include "sarsa-lambda.h"
 
 /**
  * TODO:
@@ -28,6 +29,7 @@ Agent *CreatorAgent(AgentType agent_t, bool train)
 	case AT_MonteCarlo: return new MonteCarloAgent(!train);
 	case AT_Sarsa: return new SarsaAgent(!train);
 	case AT_QLearning: return new QLearningAgent(!train);
+	case AT_SarsaLambda: return new SarsaLambdaAgent(!train);
 	default: return 0;
 	}
 }
@@ -39,13 +41,14 @@ void set_random_seed(int seed)
 }
 
 void usage(const char *progname) {
-	cerr << "Usage:\n\t" << progname << " [-t|m|s|q]\n"
+	cerr << "Usage:\n\t" << progname << " [-t|m|s|q|l]\n"
 			<< "Options:\n"
 			<< "\t-t\ttrain mode\n"
 			<< "\t-m\tuse monte-carlo method\n"
 			<< "\t-s\tuse sarsa method\n"
 			<< "\t-q\tuse qlearning method\n"
-			;
+			<< "\t-l\tuse sarsa(lambda) method"
+			<< std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -53,12 +56,13 @@ int main(int argc, char **argv) {
 	AgentType agent_t = AT_None;
 
 	int  opt;
-	while ((opt = getopt(argc, argv, "tmsq")) != -1) {
+	while ((opt = getopt(argc, argv, "tmsql")) != -1) {
 		switch (opt) {
 		case 't': train = true; break;
 		case 'm': agent_t = AT_MonteCarlo; break;
 		case 's': agent_t = AT_Sarsa; break;
 		case 'q': agent_t = AT_QLearning; break;
+		case 'l': agent_t = AT_SarsaLambda; break;
 		default: usage(argv[0]); exit(1);
 		}
 	}

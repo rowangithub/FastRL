@@ -13,14 +13,15 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <string>
 #include <vector>
 #include <map>
 
 template<class KeyType, class DataType>
 class Table: public std::map<KeyType, DataType> {
 public:
-	void save(const char *file_name) const {
-		std::ofstream fout(file_name);
+	void save(const std::string file_name) const {
+		std::ofstream fout(file_name.c_str());
 
 		if (fout.good()) {
 			fout << *this;
@@ -29,8 +30,8 @@ public:
 		fout.close();
 	}
 
-	void load(const char *file_name) {
-		std::ifstream fin(file_name);
+	void load(const std::string file_name) {
+		std::ifstream fin(file_name.c_str());
 
 		if (fin.good()) {
 			fin >> *this;

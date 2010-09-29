@@ -6,7 +6,7 @@ DIR="$2"
 NUM="5120"
 
 usage() {
-    echo "Usage: $0 [-m|-s|-q] [dir]"
+    echo "Usage: $0 [-m|-s|-q|-l] [dir]"
 }
 
 if [ -z $OPT ]; then

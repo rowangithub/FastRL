@@ -8,7 +8,6 @@
 #ifndef SARSA_H_
 #define SARSA_H_
 
-#include "table.h"
 #include "td-agent.h"
 
 /**
@@ -16,23 +15,16 @@
  */
 class SarsaAgent: public TemporalDifferenceAgent {
 public:
-	SarsaAgent(const bool test): TemporalDifferenceAgent(test) {
-		qtable_.load("sarsa.txt");
+	SarsaAgent(const bool test): TemporalDifferenceAgent("sarsa", test) {
+
 	}
 
 	virtual ~SarsaAgent() {
-		if (!test()) {
-			qtable_.save("sarsa.txt");
-		}
-	}
 
-	double & qvalue(const State &, const int &);
+	}
 
 	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state, int);
 	virtual void fail(const State & state, int action, double reward);
-
-private:
-	StateActionPairTable<double> qtable_;
 };
 
 

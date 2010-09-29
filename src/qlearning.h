@@ -8,7 +8,6 @@
 #ifndef QLEARNING_H_
 #define QLEARNING_H_
 
-#include "table.h"
 #include "td-agent.h"
 
 /**
@@ -16,23 +15,16 @@
  */
 class QLearningAgent: public TemporalDifferenceAgent {
 public:
-	QLearningAgent(const bool test): TemporalDifferenceAgent(test) {
-		qtable_.load("qlearning.txt");
+	QLearningAgent(const bool test): TemporalDifferenceAgent("qlearning", test) {
+
 	}
 
 	virtual ~QLearningAgent() {
-		if (!test()) {
-			qtable_.save("qlearning.txt");
-		}
-	}
 
-	double & qvalue(const State &, const int &);
+	}
 
 	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state, int);
 	virtual void fail(const State & state, int action, double reward);
-
-private:
-	StateActionPairTable<double> qtable_;
 };
 
 

@@ -8,7 +8,10 @@
 #ifndef TDAGENT_H_
 #define TDAGENT_H_
 
+#include <string>
+
 #include "epsilon-agent.h"
+#include "table.h"
 
 /**
  * temporal difference based method
@@ -19,11 +22,21 @@ public:
 	static const double gamma = 1.0 - 1.0e-6; //constant step parameter
 
 public:
-	TemporalDifferenceAgent(const bool test): EpsilonAgent(test) {
+	TemporalDifferenceAgent(const std::string name, const bool test): EpsilonAgent(test), name_(name) {
+		qtable_.load(name_ + ".txt");
 	}
 
 	virtual ~TemporalDifferenceAgent() {
+		if (!test()) {
+			qtable_.save(name_ + ".txt");
+		}
 	}
+
+	double & qvalue(const State &, const int &);
+
+private:
+	StateActionPairTable<double> qtable_;
+	const std::string name_;
 };
 
 #endif /* TDAGENT_H_ */
