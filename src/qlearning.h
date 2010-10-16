@@ -24,7 +24,6 @@ public:
 	}
 
 	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state, int);
-	virtual void fail(const State & state, int action, double reward);
 };
 
 

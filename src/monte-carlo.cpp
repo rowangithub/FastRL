@@ -20,16 +20,8 @@ void MonteCarloAgent::learn(const State & state, int action, double reward, cons
 	history_.push_back(std::make_pair(boost::tuples::make_tuple(state, action), reward));
 }
 
-/**
- * episode terminates, update the whole state-action-pair list
- * @param state
- * @param action
- * @param reward
- */
-void MonteCarloAgent::fail(const State & state, int action, double reward)
+void MonteCarloAgent::end()
 {
-	history_.push_back(std::make_pair(boost::tuples::make_tuple(state, action), reward));
-
 	//calculate returns
 	{
 		double rewards = 0.0;

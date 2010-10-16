@@ -14,20 +14,18 @@
 
 using namespace std;
 
-double System::simulate(Agent & agent, bool verbose, Logger *logger)
+double System::simulate(Agent & agent, int max_steps, bool verbose, Logger *logger)
 {
-	int step = 0;
+	int step = 1;
 	double rewards = 0.0;
 
-	State state = pole_.get_signal<State>();
+	State state = pole_.get_signal<State>(step);
 	int action = agent.plan(state);
 
 	do {
-		step += 1;
-
 		if (verbose) {
 			pole_.print_state(step);
-			cout << " | State: " << pole_.get_signal<State>() << " | Action: " << action;
+			cout << " | State: " << pole_.get_signal<State>(step) << " | Action: " << action;
 		}
 
 		if (logger) {
@@ -35,19 +33,10 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 			logger->Flush();
 		}
 
-		pole_.step(action); //taking action
+		step += 1; pole_.step(action); //taking action
 
-		if (pole_.fail()) {
-			agent.fail(state, action, get_failure_reward()); //failure state - Çø±ðÊ§°Ü×´Ì¬¸úÒ»°ãÎ´Öª×´Ì¬£¨Î´Öª×´Ì¬³õÊ¼»¯ÎªÁã£©
-			if (verbose) {
-				cout << " | Failure" << endl;
-			}
-			step += 1;
-			break;
-		}
-
-		State post_state = pole_.get_signal<State>(); //observing s'
-		double reward = get_reward(action); //observing reward
+		State post_state = pole_.get_signal<State>(step); //observing s'
+		double reward = get_reward(); //observing reward
 		int post_action = agent.plan(post_state); //choosing a'
 
 		agent.learn(state, action, reward, post_state, post_action); //learning from experience
@@ -60,11 +49,13 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		}
 
 		rewards += reward;
-	} while(1);
+	} while(step < max_steps);
+
+	agent.end();
 
 	if (verbose) {
 		pole_.print_state(step);
-		cout << " | State: " << pole_.get_signal<State>() <<  " | The End" << endl;
+		cout << " | State: " << pole_.get_signal<State>(step) <<  " | The End" << endl;
 	}
 
 	if (logger) {

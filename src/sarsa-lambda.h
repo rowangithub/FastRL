@@ -27,7 +27,7 @@ public:
 	}
 
 	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state, int);
-	virtual void fail(const State & state, int action, double reward);
+	virtual void end();
 
 private:
 	void backup(const State & state, int action, double reward, double post_value);

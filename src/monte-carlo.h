@@ -31,7 +31,7 @@ public:
 	double & qvalue(const State &, const int &);
 
 	virtual void learn(const State & pre_state, int pre_action, double reward, const State &, int);
-	virtual void fail(const State & state, int action, double reward);
+	virtual void end();
 
 private:
 	std::list<std::pair<state_action_pair_t, double> > history_;

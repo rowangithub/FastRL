@@ -27,8 +27,8 @@ public:
 	virtual ~Agent() { }
 
 	virtual int plan(const State &) = 0;
-	virtual void learn(const State &, int, double, const State &, int) { } //learning from full quintuple
-	virtual void fail(const State &, int, double) { } //inform the agent about failure
+	virtual void learn(const State &, int, double, const State &, int) { } //learning from SARSA incremental
+	virtual void end() { } //episode ends
 
 	const bool & test() const { return test_; }
 

@@ -40,9 +40,7 @@ void SarsaLambdaAgent::backup(const State & state, int action, double reward, do
 	}
 }
 
-void SarsaLambdaAgent::fail(const State & state, int action, double reward)
+void SarsaLambdaAgent::end()
 {
-	backup(state, action, reward, 0.0);
-
 	eligibility_.clear();
 }

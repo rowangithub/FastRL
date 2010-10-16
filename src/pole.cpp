@@ -35,8 +35,13 @@ void Pole::step(int action)
 	/*** Update the four state variables, using Euler's method. ***/
 	x_  += TAU * dx_;
 	dx_ += TAU * xacc;
+
 	theta_ += TAU * dtheta_;
 	dtheta_ += TAU * thetaacc;
+
+	theta_ = normalize_angle(theta_);
+	dtheta_ = normalize_angle(dtheta_);
+
 }
 
 void Pole::log(Logger *logger, int action)

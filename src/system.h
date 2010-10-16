@@ -26,15 +26,11 @@ public:
 		pole_.reset();
 	}
 
-	double get_reward(int action) { //评价范围 [-2.0, 2.0]
-		return cos(pole_.theta()) + cos(pole_.dtheta()) - fabs(pole_.dx()) - abs(action); //以保持不动为最佳
+	double get_reward() { //评价范围 [0.0, 2.0]
+		return cos(pole_.theta()) + cos(pole_.dtheta()); //以保持不动为最佳
 	}
 
-	double get_failure_reward() {
-		return -10.0;
-	}
-
-	double simulate(Agent & agent, bool verbose = true, Logger *logger = 0);
+	double simulate(Agent & agent, int max_steps = 1024, bool verbose = false, Logger *logger = 0);
 
 private:
 	Pole pole_;
