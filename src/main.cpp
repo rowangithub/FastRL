@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
 
 	if (!train) { //test
 		Logger logger("cart-pole.rcg");
-		double reward = System().simulate(*agent, 1024, true, &logger);
+		double reward = System().simulate(*agent, 512, true, &logger);
 		cout << "Reward: " << reward << endl;
 	}
 	else { //train

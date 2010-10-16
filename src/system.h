@@ -30,7 +30,7 @@ public:
 		return cos(pole_.theta()) + cos(pole_.dtheta()); //以保持不动为最佳
 	}
 
-	double simulate(Agent & agent, int max_steps = 1024, bool verbose = false, Logger *logger = 0);
+	double simulate(Agent & agent, int max_steps = 512, bool verbose = false, Logger *logger = 0);
 
 private:
 	Pole pole_;
