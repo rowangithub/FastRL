@@ -47,7 +47,7 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		}
 
 		State post_state = pole_.get_signal<State>(); //observing s'
-		double reward = get_reward(action); //observing reward
+		double reward = get_reward(); //observing reward
 		int post_action = agent.plan(post_state); //choosing a'
 
 		agent.learn(state, action, reward, post_state, post_action); //learning from experience
