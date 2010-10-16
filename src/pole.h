@@ -22,10 +22,11 @@ public:
 		reset();
 	}
 
-	const double & x() const { return x_; }
-	const double & dx() const { return dx_; }
 	const double & theta() const {	return theta_; }
-	const double & dtheta() const { return dtheta_; }
+
+	bool fail() const {
+		return fabs(theta_) > 90.0 * one_degree;
+	}
 
 	void perturbation() { //微小扰动 - 模拟人放置杆子
 		dtheta_ = irand(-one_degree, one_degree);
@@ -44,8 +45,8 @@ public:
 	 * state signal
 	 */
 	template<class State>
-	State get_signal(int step) {
-		return State(step, theta_ / one_degree, dtheta_ / one_degree);
+	State get_signal() {
+		return State(theta_ / one_degree, dtheta_ / one_degree);
 	}
 
 	void print_state(int step) {

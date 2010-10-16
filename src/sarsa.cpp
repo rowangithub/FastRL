@@ -15,3 +15,8 @@ void SarsaAgent::learn(const State & state, int action, double reward, const Sta
 
 	u += alpha * (reward + gamma * v - u);
 }
+
+void SarsaAgent::fail(const State & state, int action, double reward)
+{
+	qvalue(state, action) = reward;
+}

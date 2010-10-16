@@ -36,5 +36,4 @@ inline double normalize_angle(double angle)
 
 	return angle;
 }
-
 #endif /* UTILS_H_ */

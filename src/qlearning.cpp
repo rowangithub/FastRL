@@ -15,3 +15,8 @@ void QLearningAgent::learn(const State & state, int action, double reward, const
 
 	u += alpha * (reward + gamma * v - u);
 }
+
+void QLearningAgent::fail(const State & state, int action, double reward)
+{
+	qvalue(state, action) = reward;
+}
