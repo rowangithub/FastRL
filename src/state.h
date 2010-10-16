@@ -13,15 +13,15 @@
 #include "boost/tuple/tuple_comparison.hpp"
 #include "boost/tuple/tuple_io.hpp"
 
-class State: public boost::tuples::tuple<int, int> {
+class State: public boost::tuples::tuple<int, int, int> {
 public:
 	State() { }
 
-	State(const int & a, const int & b): boost::tuples::tuple<int, int>(a, b) {
+	State(const int & a, const int & b, const int & c): boost::tuples::tuple<int, int, int>(a, b, c) {
 	}
 
 	State operator-() const {
-		return State(-get<0>(), -get<1>());
+		return State(-get<0>(), -get<1>(), -get<2>());
 	}
 };
 
