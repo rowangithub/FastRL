@@ -25,7 +25,7 @@ public:
 	const double & theta() const {	return theta_; }
 
 	bool fail() const {
-		return fabs(x_) > 1.5 || fabs(theta_) > 15.0 * one_degree;
+		return fabs(x_) > 1.0 || fabs(theta_) > 10.0 * one_degree;
 	}
 
 	void perturbation() { //微小扰动 - 模拟人放置杆子
