@@ -7,7 +7,6 @@ usage() {
 }
 
 if [ -z $DIR ]; then
-    echo "Error: no working directory specilized"
     usage
     exit
 fi

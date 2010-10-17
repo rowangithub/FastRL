@@ -7,22 +7,15 @@ DIR="$3"
 NUM="5120"
 
 usage() {
-    ./pole --help
+    echo "Usage: $0 [alg] [pol] [dir]"
 }
 
-if [ -z $OPT ]; then
-    echo "Error: no learning method specilized"
+if [ -z $ALG ] || [ -z $POL ] || [ -z $DIR ]; then
     usage
     exit
 fi
 
-if [ -z $DIR ]; then
-    echo "Error: no working directory specilized"
-    usage
-    exit
-fi
-
-OUTPUT="learning-curve$1.txt"
+OUTPUT="learning-curve-$ALG-$POL.txt"
 BEGIN=`date +'%s'`
 
 cd $DIR
