@@ -10,25 +10,25 @@
 
 #include <string>
 
-#include "agent.h"
+#include "epsilon-agent.h"
 #include "table.h"
 
 /**
  * temporal difference based method
  */
-class TemporalDifferenceAgent: public Agent {
+class TemporalDifferenceAgent: public EpsilonAgent {
 public:
 	static const double alpha = 0.15; //learning rate - which is somehow good according to empirical resutls
 	static const double gamma = 1.0 - 1.0e-6; //constant step parameter
 
 public:
-	TemporalDifferenceAgent(const std::string name, const PolicyType policy_type, const bool test): Agent(policy_type, test), name_(name) {
-		qtable_.load(name_ + "_" + policy_name());
+	TemporalDifferenceAgent(const std::string name, const bool test): EpsilonAgent(test), name_(name) {
+		qtable_.load(name_ + ".txt");
 	}
 
 	virtual ~TemporalDifferenceAgent() {
 		if (!test()) {
-			qtable_.save(name_ + "_" + policy_name());
+			qtable_.save(name_ + ".txt");
 		}
 	}
 

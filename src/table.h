@@ -20,8 +20,7 @@
 template<class KeyType, class DataType>
 class Table: public std::map<KeyType, DataType> {
 public:
-	void save(std::string file_name) const {
-		file_name += ".tbl";
+	void save(const std::string file_name) const {
 		std::ofstream fout(file_name.c_str());
 
 		if (fout.good()) {
@@ -31,8 +30,7 @@ public:
 		fout.close();
 	}
 
-	void load(std::string file_name) {
-		file_name += ".tbl";
+	void load(const std::string file_name) {
 		std::ifstream fin(file_name.c_str());
 
 		if (fin.good()) {
@@ -88,12 +86,12 @@ template<class DataType>
 class StateActionPairTable: public Table<State, ActionDistribution<DataType> > {
 public:
 	DataType & operator()(const State & state, int action) {
-        if (this->count(state)) {
-            return this->operator[](state)[action];
-        }
-        else {
-            return this->operator[](-state)[-action];
-        }
+		if (this->count(state)) {
+			return this->operator[](state)[action];
+		}
+		else {
+			return this->operator[](-state)[-action]; //¿¼ÂÇ¶Ô³ÆÐÔ
+		}
 	}
 
 	DataType & operator()(const state_action_pair_t & pair) {

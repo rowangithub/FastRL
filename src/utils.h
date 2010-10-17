@@ -19,7 +19,7 @@ inline double irand(const double & min, const double & max)
 	return min + (max - min) * drand48();
 }
 
-inline double get_prob()
+inline double prob()
 {
 	return drand48();
 }

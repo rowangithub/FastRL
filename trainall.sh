@@ -7,6 +7,7 @@ usage() {
 }
 
 if [ -z $DIR ]; then
+    echo "Error: no working directory specilized"
     usage
     exit
 fi
@@ -18,9 +19,7 @@ make clean
 make
 cd ..
 
-for alg in m s q l; do
-    for pol in e s; do
-        ./train.sh $alg $pol $DIR &
-    done
+for opt in m s q l; do
+    ./train.sh -$opt $DIR &
 done
 

@@ -4,7 +4,6 @@ do_clean() {
     cd $1
     make clean
     rm -f *.txt
-    rm -f *.tbl
     rm -f *.rcg
     cd ..
 }

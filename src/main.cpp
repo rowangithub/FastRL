@@ -1,10 +1,3 @@
-#include <boost/program_options.hpp>
-namespace po = boost::program_options;
-
-#include <iostream>
-#include <iterator>
-using namespace std;
-
 #include "pole.h"
 #include "logger.h"
 #include "system.h"
@@ -28,13 +21,15 @@ using namespace std;
  *      8、状态是否不需要考虑x? - 确认无关
  */
 
-Agent *CreatorAgent(AlgorithmType algorithm_t, PolicyType policy_type, bool train)
+using namespace std;
+
+Agent *CreatorAgent(AgentType agent_t, bool train)
 {
-	switch (algorithm_t) {
-	case AT_MonteCarlo: return new MonteCarloAgent(policy_type, !train);
-	case AT_Sarsa: return new SarsaAgent(policy_type, !train);
-	case AT_QLearning: return new QLearningAgent(policy_type, !train);
-	case AT_SarsaLambda: return new SarsaLambdaAgent(policy_type, !train);
+	switch (agent_t) {
+	case AT_MonteCarlo: return new MonteCarloAgent(!train);
+	case AT_Sarsa: return new SarsaAgent(!train);
+	case AT_QLearning: return new QLearningAgent(!train);
+	case AT_SarsaLambda: return new SarsaLambdaAgent(!train);
 	default: return 0;
 	}
 }
@@ -45,66 +40,42 @@ void set_random_seed(int seed)
 	srand48(seed);
 }
 
+void usage(const char *progname) {
+	cerr << "Usage:\n\t" << progname << " [-t|m|s|q|l]\n"
+			<< "Options:\n"
+			<< "\t-t\ttrain mode\n"
+			<< "\t-m\tuse monte-carlo method\n"
+			<< "\t-s\tuse sarsa method\n"
+			<< "\t-q\tuse qlearning method\n"
+			<< "\t-l\tuse sarsa(lambda) method"
+			<< std::endl;
+}
+
 int main(int argc, char **argv) {
-	AlgorithmType algorithm_type = AT_None;
-	PolicyType policy_type = PT_None;
 	bool train = false;
+	AgentType agent_t = AT_None;
 
-	try {
-		po::options_description desc("Allowed options");
-		desc.add_options()
-	            				("help,h", "produce help message")
-	            				("train,t", "set as train mode")
-	            				("algorithm,a", po::value<char>(), "set algorithm type m|s|q|l")
-	            				("policy,p", po::value<char>(), "set policy type r|g|e|s")
-	            				;
-
-		po::variables_map vm;
-		po::store(po::parse_command_line(argc, argv, desc), vm);
-		po::notify(vm);
-
-		if (vm.count("help")) {
-			cout << desc << "\n";
-			return 0;
+	int  opt;
+	while ((opt = getopt(argc, argv, "tmsql")) != -1) {
+		switch (opt) {
+		case 't': train = true; break;
+		case 'm': agent_t = AT_MonteCarlo; break;
+		case 's': agent_t = AT_Sarsa; break;
+		case 'q': agent_t = AT_QLearning; break;
+		case 'l': agent_t = AT_SarsaLambda; break;
+		default: usage(argv[0]); exit(1);
 		}
-
-		if (vm.count("train")) {
-			train = true;
-		}
-
-		if (!vm.count("algorithm") || !vm.count("policy")) {
-			cout << desc << "\n";
-			return 1;
-		}
-
-		switch (vm["algorithm"].as<char>()) {
-		case 'm': algorithm_type = AT_MonteCarlo; break;
-		case 's': algorithm_type = AT_Sarsa; break;
-		case 'q': algorithm_type = AT_QLearning; break;
-		case 'l': algorithm_type = AT_SarsaLambda; break;
-		default: cout << desc << "\n"; return 1;
-		}
-
-		switch (vm["policy"].as<char>()) {
-		case 'r': policy_type = PT_Random; break;
-		case 'g': policy_type = PT_Greedy; break;
-		case 'e': policy_type = PT_EpsilonGreedy; break;
-		case 's': policy_type = PT_Softmax; break;
-		default: cout << desc << "\n"; return 1;
-		}
-	}
-	catch(exception& e) {
-		cerr << "error: " << e.what() << "\n";
-		return 1;
-	}
-	catch(...) {
-		cerr << "Exception of unknown type!\n";
-		return 1;
 	}
 
 	set_random_seed(getpid());
 
-	Agent *agent = CreatorAgent(algorithm_type, policy_type, train);
+	Agent *agent = CreatorAgent(agent_t, train);
+
+	if (!agent) {
+		cerr << "Error: No learning method provided" << endl;
+		usage(argv[0]);
+		return 1;
+	}
 
 	if (!train) { //test
 		Logger logger("cart-pole.rcg");

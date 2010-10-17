@@ -18,7 +18,7 @@ public:
 	static const double lambda = 0.9;
 
 public:
-	SarsaLambdaAgent(const PolicyType policy_type, const bool test): TemporalDifferenceAgent("sarsa-lambda", policy_type, test) {
+	SarsaLambdaAgent(const bool test): TemporalDifferenceAgent("sarsa-lambda", test) {
 
 	}
 

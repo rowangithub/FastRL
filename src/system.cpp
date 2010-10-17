@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-#include <cassert>
 
 #include "state.h"
 #include "system.h"
@@ -22,7 +21,6 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 
 	State state = pole_.get_signal<State>();
 	int action = agent.plan(state);
-	assert(action == -1 || action == 0 || action == 1);
 
 	do {
 		step += 1;
@@ -51,7 +49,6 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		State post_state = pole_.get_signal<State>(); //observing s'
 		double reward = get_reward(); //observing reward
 		int post_action = agent.plan(post_state); //choosing a'
-		assert(post_action == -1 || post_action == 0 || post_action == 1);
 
 		agent.learn(state, action, reward, post_state, post_action); //learning from experience
 

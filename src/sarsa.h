@@ -15,7 +15,7 @@
  */
 class SarsaAgent: public TemporalDifferenceAgent {
 public:
-	SarsaAgent(const PolicyType policy_type, const bool test): TemporalDifferenceAgent("sarsa", policy_type, test) {
+	SarsaAgent(const bool test): TemporalDifferenceAgent("sarsa", test) {
 
 	}
 

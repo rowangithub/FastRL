@@ -4,39 +4,39 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/agent.cpp \
+../src/epsilon-agent.cpp \
 ../src/logger.cpp \
 ../src/main.cpp \
 ../src/monte-carlo.cpp \
 ../src/pole.cpp \
-../src/policy.cpp \
 ../src/qlearning.cpp \
+../src/random-agent.cpp \
 ../src/sarsa-lambda.cpp \
 ../src/sarsa.cpp \
 ../src/system.cpp \
 ../src/td-agent.cpp 
 
 OBJS += \
-./src/agent.o \
+./src/epsilon-agent.o \
 ./src/logger.o \
 ./src/main.o \
 ./src/monte-carlo.o \
 ./src/pole.o \
-./src/policy.o \
 ./src/qlearning.o \
+./src/random-agent.o \
 ./src/sarsa-lambda.o \
 ./src/sarsa.o \
 ./src/system.o \
 ./src/td-agent.o 
 
 CPP_DEPS += \
-./src/agent.d \
+./src/epsilon-agent.d \
 ./src/logger.d \
 ./src/main.d \
 ./src/monte-carlo.d \
 ./src/pole.d \
-./src/policy.d \
 ./src/qlearning.d \
+./src/random-agent.d \
 ./src/sarsa-lambda.d \
 ./src/sarsa.d \
 ./src/system.d \

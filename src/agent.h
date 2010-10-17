@@ -8,13 +8,10 @@
 #ifndef AGENT_H_
 #define AGENT_H_
 
-#include "policy.h"
-
 class State;
 
-enum AlgorithmType {
+enum AgentType {
 	AT_None,
-
 	AT_MonteCarlo,
 	AT_Sarsa,
 	AT_QLearning,
@@ -23,26 +20,19 @@ enum AlgorithmType {
 
 class Agent {
 public:
-	Agent(const PolicyType policy_type, const bool test): policy_type_(policy_type), test_(test) {
+	Agent(const bool test): test_(test) {
 
 	}
 
 	virtual ~Agent() { }
 
-	int plan(const State & state);
-
-	virtual double & qvalue(const State &, const int &) = 0;
-	virtual void learn(const State &, int, double, const State &, int) = 0; //learning from full quintuple
-	virtual void fail(const State &, int, double) = 0; //inform the agent about failure
+	virtual int plan(const State &) = 0;
+	virtual void learn(const State &, int, double, const State &, int) { } //learning from full quintuple
+	virtual void fail(const State &, int, double) { } //inform the agent about failure
 
 	const bool & test() const { return test_; }
 
-	std::string policy_name() {
-		return Policy::name(policy_type_);
-	}
-
 private:
-	const PolicyType policy_type_;
 	const bool test_;
 };
 
