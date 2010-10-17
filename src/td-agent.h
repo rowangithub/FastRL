@@ -23,12 +23,12 @@ public:
 
 public:
 	TemporalDifferenceAgent(const std::string name, const PolicyType policy_type, const bool test): Agent(policy_type, test), name_(name) {
-		qtable_.load(name_ + ".txt");
+		qtable_.load(name_ + "_" + policy_name());
 	}
 
 	virtual ~TemporalDifferenceAgent() {
 		if (!test()) {
-			qtable_.save(name_ + ".txt");
+			qtable_.save(name_ + "_" + policy_name());
 		}
 	}
 
