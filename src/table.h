@@ -86,7 +86,12 @@ template<class DataType>
 class StateActionPairTable: public Table<State, ActionDistribution<DataType> > {
 public:
 	DataType & operator()(const State & state, int action) {
-        return this->operator[](state)[action];
+        if (this->count(state)) {
+            return this->operator[](state)[action];
+        }
+        else {
+            return this->operator[](-state)[-action]; //考虑对称性
+        }
 	}
 
 	DataType & operator()(const state_action_pair_t & pair) {
