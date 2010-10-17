@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 enum PolicyType {
 	PT_None,
@@ -20,9 +21,12 @@ enum PolicyType {
 	PT_Softmax
 };
 
+
 class Policy {
 public:
 	virtual int get_action(std::vector<double> distri) = 0;
+
+	static std::string name(PolicyType type);
 };
 
 class RandomPolicy: public Policy {

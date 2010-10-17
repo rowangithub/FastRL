@@ -19,12 +19,12 @@
 class MonteCarloAgent: public Agent {
 public:
 	MonteCarloAgent(const PolicyType policy_type, const bool test): Agent(policy_type, test) {
-		monte_carlo_.load("monte-carlo.txt");
+		monte_carlo_.load("monte-carlo_" + policy_name());
 	}
 
 	virtual ~MonteCarloAgent() {
 		if (!test()) {
-			monte_carlo_.save("monte-carlo.txt");
+			monte_carlo_.save("monte-carlo_" + policy_name());
 		}
 	}
 

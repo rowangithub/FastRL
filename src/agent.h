@@ -37,6 +37,10 @@ public:
 
 	const bool & test() const { return test_; }
 
+	std::string policy_name() {
+		return Policy::name(policy_type_);
+	}
+
 private:
 	const PolicyType policy_type_;
 	const bool test_;

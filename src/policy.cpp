@@ -11,6 +11,17 @@
 #include "policy.h"
 #include "utils.h"
 
+std::string Policy::name(PolicyType type)
+{
+	switch(type) {
+	case PT_Random: return "random";
+	case PT_Greedy: return "greedy";
+	case PT_EpsilonGreedy: return "epsilon-greedy";
+	case PT_Softmax: return "softmax";
+	default: return "none";
+	}
+}
+
 int RandomPolicy::get_action(std::vector<double> distri)
 {
 	return rand() % distri.size();

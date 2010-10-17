@@ -20,7 +20,8 @@
 template<class KeyType, class DataType>
 class Table: public std::map<KeyType, DataType> {
 public:
-	void save(const std::string file_name) const {
+	void save(std::string file_name) const {
+		file_name += ".tbl";
 		std::ofstream fout(file_name.c_str());
 
 		if (fout.good()) {
@@ -30,7 +31,8 @@ public:
 		fout.close();
 	}
 
-	void load(const std::string file_name) {
+	void load(std::string file_name) {
+		file_name += ".tbl";
 		std::ifstream fin(file_name.c_str());
 
 		if (fin.good()) {
@@ -90,7 +92,7 @@ public:
             return this->operator[](state)[action];
         }
         else {
-            return this->operator[](-state)[-action]; //考虑对称性
+            return this->operator[](-state)[-action];
         }
 	}
 
