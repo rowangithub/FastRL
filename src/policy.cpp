@@ -58,7 +58,7 @@ int SoftmaxPolicy::get_action(std::vector<double> distri)
 	std::vector<double> probs(distri.size());
 
 	for (uint i = 0; i < distri.size(); ++i) {
-		probs[i] = exp(distri[i]);
+		probs[i] = distri[i] + 1.0;
 		sum += probs[i];
 	}
 
