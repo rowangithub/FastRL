@@ -43,7 +43,7 @@ int EpsilonGreedyPolicy::get_action(std::vector<double> distri)
 
 int SoftmaxPolicy::get_action(std::vector<double> distri)
 {
-	double sum;
+	double sum = 0.0;
 	std::vector<double> probs(distri.size());
 
 	for (uint i = 0; i < distri.size(); ++i) {
