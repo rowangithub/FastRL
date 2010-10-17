@@ -20,3 +20,19 @@ void QLearningAgent::fail(const State & state, int action, double reward)
 {
 	qvalue(state, action) = reward;
 }
+
+int QLearningAgent::greedy(const State & state)
+{
+	int best = -1;
+    double max = qvalue(state, -1);
+
+    for (int i = 0; i <= 1; ++i) {
+        double q = qvalue(state, i);
+        if (q > max) {
+            max = q;
+            best = i;
+        }
+    }
+
+    return best;
+}

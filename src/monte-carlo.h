@@ -11,14 +11,14 @@
 #include <list>
 
 #include "table.h"
-#include "epsilon-agent.h"
+#include "agent.h"
 
 /**
  * first-visit on-policy Monte Carlo method
  */
-class MonteCarloAgent: public EpsilonAgent {
+class MonteCarloAgent: public Agent {
 public:
-	MonteCarloAgent(const bool test): EpsilonAgent(test) {
+	MonteCarloAgent(const PolicyType policy_type, const bool test): Agent(policy_type, test) {
 		monte_carlo_.load("monte-carlo.txt");
 	}
 

@@ -19,7 +19,9 @@ make clean
 make
 cd ..
 
-for opt in m s q l; do
-    ./train.sh -$opt $DIR &
+for alg in m s q l; do
+    for pol in e s; do
+        ./train.sh $alg $pol $DIR &
+    done
 done
 

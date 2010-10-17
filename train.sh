@@ -1,12 +1,13 @@
 #!/bin/bash 
 
-OPT="$1"
-DIR="$2"
+ALG="$1"
+POL="$2"
+DIR="$3"
 
 NUM="5120"
 
 usage() {
-    echo "Usage: $0 [-m|-s|-q|-l] [dir]"
+    ./pole --help
 }
 
 if [ -z $OPT ]; then
@@ -26,7 +27,7 @@ BEGIN=`date +'%s'`
 
 cd $DIR
 for i in `seq 1 $NUM`; do
-    REWARD=`./pole -t $OPT`
+    REWARD=`./pole --train --algorithm $ALG --policy $POL`
     TIME=`date +'%s'`
     echo $i `expr $TIME - $BEGIN` $REWARD >>$OUTPUT
     sleep 1

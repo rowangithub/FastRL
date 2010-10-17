@@ -15,7 +15,7 @@
  */
 class QLearningAgent: public TemporalDifferenceAgent {
 public:
-	QLearningAgent(const bool test): TemporalDifferenceAgent("qlearning", test) {
+	QLearningAgent(const PolicyType policy_type, const bool test): TemporalDifferenceAgent("qlearning", policy_type, test) {
 
 	}
 
@@ -25,6 +25,9 @@ public:
 
 	virtual void learn(const State & pre_state, int pre_action, double reward, const State & state, int);
 	virtual void fail(const State & state, int action, double reward);
+
+private:
+	int greedy(const State & state);
 };
 
 
