@@ -17,6 +17,8 @@
 class Logger;
 
 class Pole {
+	static const double TAU = 0.02;          /* seconds between state updates */
+
 public:
 	Pole() {
 		reset();
@@ -44,13 +46,13 @@ public:
 	int coarse_coding_x(double x) {
 		int i = x / 0.8;
 
-		return MinMax(-2, i, 2);
+		return minmax(-2, i, 2);
 	}
 
 	int coarse_coding_theta(double t) {
 		int i = t / one_degree;
 
-		return MinMax(-10, i, 10);
+		return minmax(-10, i, 10);
 	}
 
 	/**
@@ -59,9 +61,9 @@ public:
 	template<class State>
 	State get_signal() {
 		int a = coarse_coding_x(x_);
-		int b = coarse_coding_x(x_ + dx_);
+		int b = coarse_coding_x(x_ + TAU * dx_);
 		int c = coarse_coding_theta(theta_);
-		int d = coarse_coding_theta(theta_ + dtheta_);
+		int d = coarse_coding_theta(theta_ + TAU * dtheta_);
 
 		return State(a, b, c, d);
 	}

@@ -27,23 +27,9 @@ inline double prob()
 
 template<typename _Tp>
 inline const _Tp&
-Max(const _Tp& x, const _Tp& y)
+minmax(const _Tp& min_, const _Tp& x, const _Tp& max_)
 {
-    return std::max(x, y);
-}
-
-template<typename _Tp>
-inline const _Tp&
-Min(const _Tp& x, const _Tp& y)
-{
-    return std::min(x, y);
-}
-
-template<typename _Tp>
-inline const _Tp&
-MinMax(const _Tp& min, const _Tp& x, const _Tp& max)
-{
-    return Min(Max(min, x), max);
+    return std::min(std::max(min_, x), max_);
 }
 
 #endif /* UTILS_H_ */

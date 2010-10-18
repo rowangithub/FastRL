@@ -18,7 +18,6 @@ void Pole::step(int action)
 	static const double LENGTH = 0.5;        /* actually half the pole's length */
 	static const double POLEMASS_LENGTH = (MASSPOLE * LENGTH);
 	static const double FORCE_MAG = 10.0;
-	static const double TAU = 0.02;          /* seconds between state updates */
 	static const double FOURTHIRDS = 1.3333333333333;
 
 	double force = (!action)? 0: ((action > 0)? FORCE_MAG : -FORCE_MAG);
