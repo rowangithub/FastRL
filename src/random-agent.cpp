@@ -9,5 +9,15 @@
 
 int RandomAgent::plan(const State &)
 {
-	return rand() % 2;
+	double p = prob();
+
+	if (p < 1 / 3.0) {
+		return -1;
+	}
+	else if (p > 2 / 3.0) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }

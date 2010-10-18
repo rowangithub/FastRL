@@ -34,20 +34,27 @@ int EpsilonAgent::plan(const State & state)
 
 int EpsilonAgent::greedy(const State & state)
 {
-	double v[2];
+	std::vector<int> actions;
+	double max = -10000.0;
 
-	v[0] = qvalue(state, 0);
-	v[1] = qvalue(state, 1);
+	for (int i = -1; i <= 1; ++i) {
+		double q = qvalue(state, i);
+		if (q > max) {
+			max = q;
+			actions.clear();
+			actions.push_back(i);
+		}
+		else if (q > max - FLOAT_EPS) {
+			actions.push_back(i);
+		}
+	}
 
-	if (fabs(v[0] - v[1]) < FLOAT_EPS) {
-		return RandomAgent::plan(state);
+	if (!actions.empty()) {
+		std::random_shuffle(actions.begin(), actions.end());
+		return actions.front();
 	}
 	else {
-		if (v[0] > v[1]) {
-			return 0;
-		}
-		else {
-			return 1;
-		}
+		assert(0);
+		return RandomAgent::plan(state);
 	}
 }

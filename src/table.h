@@ -10,18 +10,12 @@
 
 #include "state.h"
 
-#include "utils.h"
-#include "boost/tuple/tuple.hpp"
-#include "boost/tuple/tuple_comparison.hpp"
-#include "boost/tuple/tuple_io.hpp"
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <string>
 #include <vector>
 #include <map>
-#include <cassert>
 
 template<class KeyType, class DataType>
 class Table: public std::map<KeyType, DataType> {
@@ -73,13 +67,17 @@ public:
 typedef boost::tuples::tuple<State, int> state_action_pair_t;
 
 template<class DataType>
-class ActionDistribution: public boost::tuples::tuple<DataType, DataType> { //action in {0, 1}
+class ActionDistribution: public boost::tuples::tuple<DataType, DataType, DataType> {
 public:
 	DataType & operator[](const int action) {
-		switch (action) {
-		case 0: return this->template get<0>();
-		case 1: return this->template get<1>();
-		default: assert(0); return this->template get<0>();
+		if (action < 0) {
+			return this->template get<0>();
+		}
+		else if (action > 0) {
+			return this->template get<2>();
+		}
+		else {
+			return this->template get<1>();
 		}
 	}
 };
@@ -88,7 +86,12 @@ template<class DataType>
 class StateActionPairTable: public Table<State, ActionDistribution<DataType> > {
 public:
 	DataType & operator()(const State & state, int action) {
-		return this->operator[](state)[action];
+		if (this->count(state)) {
+			return this->operator[](state)[action];
+		}
+		else {
+			return this->operator[](-state)[-action]; //¿¼ÂÇ¶Ô³ÆÐÔ
+		}
 	}
 
 	DataType & operator()(const state_action_pair_t & pair) {
