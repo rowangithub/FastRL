@@ -41,15 +41,27 @@ public:
 
 	void step(int action);
 
+	int coarse_coding_x(double x) {
+		int i = x / 0.8;
+
+		return MinMax(-2, i, 2);
+	}
+
+	int coarse_coding_theta(double t) {
+		int i = t / one_degree;
+
+		return MinMax(-10, i, 10);
+	}
+
 	/**
 	 * state signal
 	 */
 	template<class State>
 	State get_signal() {
-		int a = (x_< 0? -1: 1) * (exp(fabs(x_)) - 1);
-		int b = dx_ / 0.1;
-		int c = theta_ / one_degree;
-		int d = 0.1 * dtheta_ / one_degree;
+		int a = coarse_coding_x(x_);
+		int b = coarse_coding_x(x_ + dx_);
+		int c = coarse_coding_theta(theta_);
+		int d = coarse_coding_theta(theta_ + dtheta_);
 
 		return State(a, b, c, d);
 	}

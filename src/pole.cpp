@@ -38,8 +38,6 @@ void Pole::step(int action)
 
 	theta_ += TAU * dtheta_;
 	dtheta_ += TAU * thetaacc;
-
-	theta_ = normalize_angle(theta_);
 }
 
 void Pole::log(Logger *logger, int action)

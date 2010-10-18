@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <algorithm>
 
 static const double FLOAT_EPS = 1.0e-6;
 static const double one_degree = 2 * M_PI / 360.0;
@@ -24,16 +25,25 @@ inline double prob()
 	return drand48();
 }
 
-inline double normalize_angle(double angle)
+template<typename _Tp>
+inline const _Tp&
+Max(const _Tp& x, const _Tp& y)
 {
-	while (angle <= -M_PI) {
-		angle += 2.0 * M_PI;
-	}
-
-	while (angle > M_PI) {
-		angle -= 2.0 * M_PI;
-	}
-
-	return angle;
+    return std::max(x, y);
 }
+
+template<typename _Tp>
+inline const _Tp&
+Min(const _Tp& x, const _Tp& y)
+{
+    return std::min(x, y);
+}
+
+template<typename _Tp>
+inline const _Tp&
+MinMax(const _Tp& min, const _Tp& x, const _Tp& max)
+{
+    return Min(Max(min, x), max);
+}
+
 #endif /* UTILS_H_ */
