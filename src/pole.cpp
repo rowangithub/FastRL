@@ -5,6 +5,8 @@
  *      Author: baj
  */
 
+#include <cassert>
+
 #include "pole.h"
 #include "logger.h"
 
@@ -21,7 +23,8 @@ void Pole::step(int action)
 	static const double TAU = 0.02;          /* seconds between state updates */
 	static const double FOURTHIRDS = 1.3333333333333;
 
-	double force = (!action)? 0: ((action > 0)? FORCE_MAG : -FORCE_MAG);
+	assert(action == 0 || action == 1);
+	double force = !action? -FORCE_MAG: FORCE_MAG;
 
 	double costheta = cos(theta_);
 	double sintheta = sin(theta_);
@@ -59,11 +62,11 @@ void Pole::log(Logger *logger, int action)
 	logger->LogRectangular(cart, Logger::Purple);
 	logger->LogLine(pole_bottom, pole_top, Logger::Yellow, 0);
 
-	if (action == 1) {
+	if (action == 0) {
 		Logger::Vector indicator = (cart.TopRightCorner() + cart.BottomRightCorner()) * 0.5;
 		logger->AddPoint(indicator, 0, Logger::White);
 	}
-	else if (action == -1) {
+	else {
 		Logger::Vector indicator = (cart.TopLeftCorner() + cart.BottomLeftCorner()) * 0.5;
 		logger->AddPoint(indicator, 0, Logger::White);
 	}

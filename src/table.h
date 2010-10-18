@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cassert>
 
 template<class KeyType, class DataType>
 class Table: public std::map<KeyType, DataType> {
@@ -72,17 +73,13 @@ public:
 typedef boost::tuples::tuple<State, int> state_action_pair_t;
 
 template<class DataType>
-class ActionDistribution: public boost::tuples::tuple<DataType, DataType, DataType> {
+class ActionDistribution: public boost::tuples::tuple<DataType, DataType> { //action in {0, 1}
 public:
 	DataType & operator[](const int action) {
-		if (action < 0) {
-			return this->template get<0>();
-		}
-		else if (action > 0) {
-			return this->template get<2>();
-		}
-		else {
-			return this->template get<1>();
+		switch (action) {
+		case 0: return this->template get<0>();
+		case 1: return this->template get<1>();
+		default: assert(0); return this->template get<0>();
 		}
 	}
 };
