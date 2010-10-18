@@ -23,8 +23,6 @@ void Pole::step(int action)
 
 	double force = (!action)? 0: ((action > 0)? FORCE_MAG : -FORCE_MAG);
 
-	force += irand(-FORCE_MAG, FORCE_MAG) * 0.1; //¶¯×÷Îó²î
-
 	double costheta = cos(theta_);
 	double sintheta = sin(theta_);
 
