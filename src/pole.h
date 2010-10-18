@@ -24,8 +24,6 @@ public:
 		reset();
 	}
 
-	const double & theta() const {	return theta_; }
-
 	bool fail() const {
 		return fabs(x_) > 1.0 || fabs(theta_) > 10.0 * one_degree;
 	}
@@ -44,15 +42,11 @@ public:
 	void step(int action);
 
 	int coarse_coding_x(double x) {
-		int i = x / 0.8;
-
-		return minmax(-2, i, 2);
+		return x / 0.1;
 	}
 
 	int coarse_coding_theta(double t) {
-		int i = t / one_degree;
-
-		return minmax(-10, i, 10);
+		return t / one_degree;
 	}
 
 	/**
