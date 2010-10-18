@@ -42,7 +42,7 @@ public:
 	void step(int action);
 
 	int coarse_coding_x(double x) {
-		return x / 0.1;
+		return x / 0.01;
 	}
 
 	int coarse_coding_theta(double t) {
