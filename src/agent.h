@@ -8,7 +8,7 @@
 #ifndef AGENT_H_
 #define AGENT_H_
 
-class State;
+#include "state.h"
 
 enum AgentType {
 	AT_None,

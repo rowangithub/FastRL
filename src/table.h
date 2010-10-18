@@ -10,6 +10,11 @@
 
 #include "state.h"
 
+#include "utils.h"
+#include "boost/tuple/tuple.hpp"
+#include "boost/tuple/tuple_comparison.hpp"
+#include "boost/tuple/tuple_io.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -86,12 +91,7 @@ template<class DataType>
 class StateActionPairTable: public Table<State, ActionDistribution<DataType> > {
 public:
 	DataType & operator()(const State & state, int action) {
-		if (this->count(state)) {
-			return this->operator[](state)[action];
-		}
-		else {
-			return this->operator[](-state)[-action]; //¿¼ÂÇ¶Ô³ÆÐÔ
-		}
+		return this->operator[](state)[action];
 	}
 
 	DataType & operator()(const state_action_pair_t & pair) {
