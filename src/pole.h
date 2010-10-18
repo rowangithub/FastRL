@@ -17,7 +17,7 @@
 class Logger;
 
 class Pole {
-	static const double TAU = 0.02;          /* seconds between state updates */
+	static const double time_step = 0.02;          /* seconds between state updates */
 
 public:
 	Pole() {
@@ -55,9 +55,9 @@ public:
 	template<class State>
 	State get_signal() {
 		int a = coarse_coding_x(x_);
-		int b = coarse_coding_x(x_ + TAU * dx_);
+		int b = coarse_coding_x(x_ + time_step * dx_);
 		int c = coarse_coding_theta(theta_);
-		int d = coarse_coding_theta(theta_ + TAU * dtheta_);
+		int d = coarse_coding_theta(theta_ + time_step * dtheta_);
 
 		return State(a, b, c, d);
 	}
