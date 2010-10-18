@@ -57,7 +57,7 @@ public:
 		int a = coarse_coding_x(x_);
 		int b = coarse_coding_x(x_ + time_step * dx_);
 		int c = coarse_coding_theta(theta_);
-		int d = coarse_coding_theta(dtheta_);
+		int d = coarse_coding_theta(theta_ + time_step * dtheta_);
 
 		return State(a, b, c, d);
 	}
