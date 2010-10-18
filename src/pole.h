@@ -42,7 +42,7 @@ public:
 	void step(int action);
 
 	int coarse_coding_x(double x) {
-		return x / 0.01;
+		return (x < 0.0? -1.0: 1.0) * (exp(fabs(x * 1.5)) - 1);
 	}
 
 	int coarse_coding_theta(double t) {
@@ -54,6 +54,11 @@ public:
 	 */
 	template<class State>
 	State get_signal() {
+		for (double x = -1.0; x < 1.0; x += 0.1) {
+			std::cout << x << " " << coarse_coding_x(x) << std::endl;
+		}
+		exit(0);
+
 		int a = coarse_coding_x(x_);
 		int b = coarse_coding_x(x_ + time_step * dx_);
 		int c = coarse_coding_theta(theta_);
