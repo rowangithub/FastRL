@@ -16,7 +16,7 @@ using namespace std;
 
 double System::simulate(Agent & agent, bool verbose, Logger *logger)
 {
-	const int max_steps = 32768;
+	const int max_steps = 100000;
 
 	int step = 0;
 	double rewards = 0.0;
