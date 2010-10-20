@@ -51,6 +51,17 @@ void usage(const char *progname) {
 			<< std::endl;
 }
 
+double utility(Agent *agent, const int episodes)
+{
+	double rewards = 0.0;
+
+	for (int i = 0; i < episodes; ++i) {
+		rewards += System().simulate(*agent, false);
+	}
+
+	return rewards / double(episodes);
+}
+
 int main(int argc, char **argv) {
 	bool train = false;
 	AgentType agent_t = AT_None;
@@ -69,32 +80,46 @@ int main(int argc, char **argv) {
 
 	set_random_seed(getpid());
 
-	Agent *agent = CreatorAgent(agent_t, train);
-
-	if (!agent) {
-		cerr << "Error: No learning method provided" << endl;
-		usage(argv[0]);
-		return 1;
-	}
-
 	if (!train) { //test
 		Logger logger("cart-pole.rcg");
+		Agent *agent = CreatorAgent(agent_t, train);
+
+		if (!agent) {
+			cerr << "Error: No learning method provided" << endl;
+			usage(argv[0]);
+			return 1;
+		}
+
 		double reward = System().simulate(*agent, true, & logger);
 		cout << "Reward: " << reward << endl;
+
+		delete agent;
 	}
 	else { //train
 		const int episodes = 1024;
 		double rewards = 0.0;
 		int loops = episodes;
 
+		Agent *agent = CreatorAgent(agent_t, train);
+
+		if (!agent) {
+			cerr << "Error: No learning method provided" << endl;
+			usage(argv[0]);
+			return 1;
+		}
+
 		do {
 			rewards += System().simulate(*agent, false);
 		} while(loops--);
 
-		cout << rewards / double(episodes) << endl;
-	}
+		delete agent; //save learned table
 
-	delete agent;
+		//evaluate policy
+		agent = CreatorAgent(agent_t, false);
+		cout << utility(agent, episodes) << endl;
+
+		delete agent;
+	}
 
 	return 0;
 }

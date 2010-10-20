@@ -16,6 +16,8 @@ using namespace std;
 
 double System::simulate(Agent & agent, bool verbose, Logger *logger)
 {
+	const int max_steps = 32768;
+
 	int step = 0;
 	double rewards = 0.0;
 
@@ -60,7 +62,7 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		}
 
 		rewards += reward;
-	} while(1);
+	} while(step < max_steps);
 
 	if (verbose) {
 		pole_.print_state(step);
