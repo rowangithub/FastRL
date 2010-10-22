@@ -55,11 +55,14 @@ double utility(Agent *agent, const int episodes)
 {
 	double rewards = 0.0;
 
+	bool tmp = agent->test();
 	agent->set_test(true);
+
 	for (int i = 0; i < episodes; ++i) {
 		rewards += System().simulate(*agent, false);
 	}
-	agent->set_test(false);
+
+	agent->set_test(tmp);
 
 	return rewards / double(episodes);
 }
