@@ -31,9 +31,10 @@ public:
 	virtual void fail(const State &, int, double) { } //inform the agent about failure
 
 	const bool & test() const { return test_; }
+	void set_test(const bool test) { test_ = test; }
 
 private:
-	const bool test_;
+	bool test_;
 };
 
 #endif /* AGENT_H_ */

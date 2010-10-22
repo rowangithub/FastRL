@@ -12,7 +12,18 @@
 
 void SarsaLambdaAgent::learn(const State & state, int action, double reward, const State & post_state, int post_action)
 {
+	if (test()) return;
+
 	backup(state, action, reward, qvalue(post_state, post_action));
+}
+
+void SarsaLambdaAgent::fail(const State & state, int action, double reward)
+{
+	if (test()) return;
+
+	backup(state, action, reward, 0.0);
+
+	eligibility_.clear();
 }
 
 void SarsaLambdaAgent::backup(const State & state, int action, double reward, double post_value)
@@ -38,11 +49,4 @@ void SarsaLambdaAgent::backup(const State & state, int action, double reward, do
 	for (std::set<state_action_pair_t>::iterator it = zeros.begin(); it != zeros.end(); ++it) {
 		eligibility_.erase(*it);
 	}
-}
-
-void SarsaLambdaAgent::fail(const State & state, int action, double reward)
-{
-	backup(state, action, reward, 0.0);
-
-	eligibility_.clear();
 }

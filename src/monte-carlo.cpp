@@ -17,6 +17,8 @@ double & MonteCarloAgent::qvalue(const State & state, const int & action)
 
 void MonteCarloAgent::learn(const State & state, int action, double reward, const State &, int)
 {
+	if (test()) return;
+
 	history_.push_back(std::make_pair(boost::tuples::make_tuple(state, action), reward));
 }
 
@@ -28,6 +30,8 @@ void MonteCarloAgent::learn(const State & state, int action, double reward, cons
  */
 void MonteCarloAgent::fail(const State & state, int action, double reward)
 {
+	if (test()) return;
+
 	history_.push_back(std::make_pair(boost::tuples::make_tuple(state, action), reward));
 
 	//calculate returns
