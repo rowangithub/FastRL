@@ -42,11 +42,19 @@ public:
 	void step(int action);
 
 	int coarse_coding_x(double x) {
-		return x / 0.05;
+		return (x < 0.0? -1.0: 1.0) * (exp(fabs(x * 1.5)) - 1);
+	}
+
+	int coarse_coding_dx(double dx) {
+		return dx / 0.01;
 	}
 
 	int coarse_coding_theta(double t) {
 		return t / one_degree;
+	}
+
+	int coarse_coding_dtheta(double dt) {
+		return dt / one_degree;
 	}
 
 	/**
@@ -55,9 +63,9 @@ public:
 	template<class State>
 	State get_signal() {
 		int a = coarse_coding_x(x_);
-		int b = coarse_coding_x(dx_);
+		int b = coarse_coding_dx(dx_);
 		int c = coarse_coding_theta(theta_);
-		int d = coarse_coding_theta(dtheta_);
+		int d = coarse_coding_dtheta(dtheta_);
 
 		return State(a, b, c, d);
 	}

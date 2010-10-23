@@ -51,8 +51,10 @@ void usage(const char *progname) {
 			<< std::endl;
 }
 
-double utility(Agent *agent, const int episodes)
+double utility(Agent *agent)
 {
+    const int episodes = 5120;
+
 	double rewards = 0.0;
 
 	bool tmp = agent->test();
@@ -109,7 +111,7 @@ int main(int argc, char **argv) {
 		} while(loops--);
 
 		//evaluate policy
-		cout << utility(agent, episodes) << endl;
+		cout << utility(agent) << endl;
 	}
 
 	delete agent; //save learned table if necessarily

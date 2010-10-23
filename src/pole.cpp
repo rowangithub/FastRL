@@ -17,7 +17,7 @@ void Pole::step(int action)
 
 	double F = (!action)? 0: ((action > 0)? 10.0 : -10.0);
 
-    F += irand(-1.0, 1.0); //add some noise
+    F += irand(-5.0, 5.0); //add some noise
 
 	double costheta = cos(theta_);
 	double sintheta = sin(theta_);

@@ -16,7 +16,7 @@ using namespace std;
 
 double System::simulate(Agent & agent, bool verbose, Logger *logger)
 {
-	const int max_steps = 100000;
+	const int max_steps = 655535;
 
 	int step = 0;
 	double rewards = 0.0;
@@ -40,7 +40,10 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		pole_.step(action); //taking action
 
 		if (pole_.fail()) {
-			agent.fail(state, action, get_failure_reward()); //failure state - 区别失败状态跟一般未知状态（未知状态初始化为零）
+            if (!agent.test()) {
+                agent.fail(state, action, get_failure_reward()); //failure state - 区别失败状态跟一般未知状态（未知状态初始化为零）
+            }
+
 			if (verbose) {
 				cout << " | Failure" << endl;
 			}
@@ -52,7 +55,9 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		double reward = get_reward(); //observing reward
 		int post_action = agent.plan(post_state); //choosing a'
 
-		agent.learn(state, action, reward, post_state, post_action); //learning from experience
+        if (!agent.test()) {
+            agent.learn(state, action, reward, post_state, post_action); //learning from experience
+        }
 
 		state = post_state;
 		action = post_action;
