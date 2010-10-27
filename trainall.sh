@@ -1,6 +1,8 @@
 #!/bin/bash
 
 DIR=$1
+CON="true"
+ALG="m"
 
 usage() {
     echo "Usage: $0 [dir]"
@@ -12,14 +14,16 @@ if [ -z $DIR ]; then
     exit
 fi
 
-./clear.sh
+if [ $CON = "false" ]; then
+    ./clear.sh
+fi
 
 cd $DIR
 make clean
 make
 cd ..
 
-for opt in m s q l; do
+for opt in $ALG; do
     ./train.sh -$opt $DIR &
 done
 

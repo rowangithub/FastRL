@@ -24,11 +24,20 @@ fi
 OUTPUT="learning-curve$1.txt"
 BEGIN=`date +'%s'`
 
+LASTINDX=0
+LASTTIME=0
+
 cd $DIR
+
+if [ -f $OUTPUT ]; then
+    LASTINDX=`tail -1 $OUTPUT | awk '{print $1}'`
+    LASTTIME=`tail -1 $OUTPUT | awk '{print $2}'`
+fi
+
 for i in `seq 1 $NUM`; do
     REWARD=`./pole -t $OPT`
     TIME=`date +'%s'`
-    echo $i `expr $TIME - $BEGIN` $REWARD >>$OUTPUT
+    echo `expr $i + $LASTINDX` `expr $TIME - $BEGIN + $LASTTIME` $REWARD >>$OUTPUT
     sleep 1
 done
 

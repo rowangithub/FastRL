@@ -11,6 +11,10 @@
 #include <cmath>
 #include <cstdlib>
 #include <algorithm>
+#include <ctime>
+
+#include <boost/random.hpp>
+#include <boost/random/normal_distribution.hpp>
 
 static const double FLOAT_EPS = 1.0e-6;
 static const double one_degree = 2 * M_PI / 360.0;
@@ -18,6 +22,15 @@ static const double one_degree = 2 * M_PI / 360.0;
 inline double irand(const double & min, const double & max)
 {
 	return min + (max - min) * drand48();
+}
+
+inline double normal_dist() //mean: 0.0, sd: 1.0
+{
+    static boost::mt19937 rng(static_cast<unsigned>(getpid()));
+    static boost::normal_distribution<> nd(0.0, 1.0);
+    static boost::variate_generator<boost::mt19937, boost::normal_distribution<> > var_nor(rng, nd);
+
+    return var_nor();
 }
 
 inline double prob()

@@ -53,7 +53,7 @@ void usage(const char *progname) {
 
 double utility(Agent *agent)
 {
-    const int episodes = 5120;
+    const int episodes = 2048;
 
 	double rewards = 0.0;
 

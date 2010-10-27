@@ -10,20 +10,23 @@
 
 void Pole::step(int action)
 {
+    static const double f = 1.0;
 	static const double g = 9.8;
 	static const double l = 1.0;
 	static const double mc = 1.0;
 	static const double mp = 0.1;
 
-	double F = (!action)? 0: ((action > 0)? 10.0 : -10.0);
+	double force = ((!action)? 0: ((action > 0)? f : -f));
 
-    F += irand(-5.0, 5.0); //add some noise
+    if (action) {
+        force += irand(-f, f) * 0.5;
+    }
 
 	double costheta = cos(theta_);
 	double sintheta = sin(theta_);
 
-	double ddtheta = (g * sintheta + costheta * ((-F - mp * l * dtheta_ * dtheta_ * sintheta) / (mc + mp))) / (l * (4.0 / 3.0 - (mp * costheta * costheta) / (mc + mp)));
-	double ddx = (F + mp * l * (dtheta_ * dtheta_ * sintheta - ddtheta * costheta)) / (mc + mp);
+	double ddtheta = (g * sintheta + costheta * ((-force - mp * l * dtheta_ * dtheta_ * sintheta) / (mc + mp))) / (l * (4.0 / 3.0 - (mp * costheta * costheta) / (mc + mp)));
+	double ddx = (force + mp * l * (dtheta_ * dtheta_ * sintheta - ddtheta * costheta)) / (mc + mp);
 
 	x_  += time_step * dx_;
 	dx_ += time_step * ddx;
