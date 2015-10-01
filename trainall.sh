@@ -2,7 +2,7 @@
 
 DIR=$1
 CON="true"
-ALG="m"
+ALG="m s q l"
 
 usage() {
     echo "Usage: $0 [dir]"

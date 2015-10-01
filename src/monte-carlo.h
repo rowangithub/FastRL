@@ -25,6 +25,7 @@ public:
 	virtual ~MonteCarloAgent() {
 		if (!test()) {
 			monte_carlo_.save("monte-carlo.txt");
+
 		}
 	}
 

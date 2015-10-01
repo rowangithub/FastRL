@@ -22,22 +22,22 @@ void SarsaLambdaAgent::fail(const State & state, int action, double reward)
 	eligibility_.clear();
 }
 
-void SarsaLambdaAgent::backup(const State & state, int action, double reward, double post_value)
+void SarsaLambdaAgent::backup(const State & state, int action, double reward, double post_qvalue)
 {
-	const double delta = reward + gamma * post_value - qvalue(state, action);
-
 	eligibility_[boost::tuples::make_tuple(state, action)] = 1.0;
 
 	std::set<state_action_pair_t> zeros;
 	for (std::map<state_action_pair_t, double>::iterator it = eligibility_.begin(); it != eligibility_.end(); ++it) {
 		const State & state = it->first.get<0>();
 		int action = it->first.get<1>();
-		double & e = it->second;
+		double & eligbility = it->second;
 
-		qvalue(state, action) += alpha * delta * e;
-		e *= gamma * lambda;
+        const double delta = reward + gamma * post_qvalue - qvalue(state, action); //这里跟 Sutton 书上是不一样的
 
-		if (e < FLOAT_EPS) {
+		qvalue(state, action) += alpha * delta * eligbility;
+		eligbility *= gamma * lambda;
+
+		if (eligbility < FLOAT_EPS) {
 			zeros.insert(it->first);
 		}
 	}

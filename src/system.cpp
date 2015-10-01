@@ -41,7 +41,7 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 
 		if (pole_.fail()) {
             if (!agent.test()) {
-                agent.fail(state, action, get_failure_reward()); //failure state - Çø±ðÊ§°Ü×´Ì¬¸úÒ»°ãÎ´Öª×´Ì¬£¨Î´Öª×´Ì¬³õÊ¼»¯ÎªÁã£©
+                agent.fail(state, action, get_failure_reward()); //failure state - ï¿½ï¿½ï¿½Ê§ï¿½ï¿½×´Ì¬ï¿½ï¿½Ò»ï¿½ï¿½Î´Öª×´Ì¬ï¿½ï¿½Î´Öª×´Ì¬ï¿½ï¿½Ê¼ï¿½ï¿½Îªï¿½ã£©
             }
 
 			if (verbose) {
@@ -52,11 +52,11 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		}
 
 		State post_state = pole_.get_signal<State>(); //observing s'
-		double reward = get_reward(); //observing reward
+		double reward = get_reward(); //observing immediate reward
 		int post_action = agent.plan(post_state); //choosing a'
 
         if (!agent.test()) {
-            agent.learn(state, action, reward, post_state, post_action); //learning from experience
+            agent.learn(state, action, reward, post_state, post_action); //learning from experience - (s, a, r, s', a')
         }
 
 		state = post_state;
