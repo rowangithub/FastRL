@@ -2,7 +2,7 @@
 
 DIR=$1
 CON="true"
-ALG="m s q l"
+#ALG="m s q l"
 
 usage() {
     echo "Usage: $0 [dir]"
@@ -23,7 +23,7 @@ make clean
 make
 cd ..
 
-for opt in $ALG; do
-    ./train.sh -$opt $DIR &
-done
+#for opt in $ALG; do
+#    ./train.sh -$opt $DIR &
+#done
 

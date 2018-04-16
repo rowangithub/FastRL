@@ -23,6 +23,11 @@ public:
 	State operator-() const {
 		return State(-get<0>(), -get<1>(), -get<2>(), -get<3>());
 	}
+
+	std::vector<float> vec() const{
+		//return {x,vx,ax,t,vt,at};
+		return {(float)get<0>(), (float)get<1>(), (float)get<2>(), (float)get<3>()};
+	}
 };
 
 

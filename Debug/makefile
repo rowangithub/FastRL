@@ -44,7 +44,7 @@ all: pole
 pole: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++  -o "pole" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -o "pole" $(OBJS) $(USER_OBJS) $(LIBS) -L/usr/local/opt/python@2/Frameworks/Python.framework/Versions/2.7/lib/python2.7/config -lpython2.7
 	@echo 'Finished building target: $@'
 	@echo ' '
 

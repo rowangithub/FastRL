@@ -15,7 +15,8 @@
  */
 class EpsilonAgent: public RandomAgent {
 private:
-	static const double epsilon_ = 0.1;
+	//static const double epsilon_ = 0.1;
+	static constexpr double epsilon_ = 0.1;
 
 public:
 	EpsilonAgent(const bool test): RandomAgent(test) {

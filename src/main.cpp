@@ -6,6 +6,7 @@
 #include "sarsa.h"
 #include "qlearning.h"
 #include "sarsa-lambda.h"
+#include "neural-agent.h"
 
 /**
  * TODO:
@@ -30,6 +31,9 @@ Agent *CreatorAgent(AgentType agent_t, bool train)
 	case AT_Sarsa: return new SarsaAgent(!train);
 	case AT_QLearning: return new QLearningAgent(!train);
 	case AT_SarsaLambda: return new SarsaLambdaAgent(!train);
+	case AT_Neuron: {
+		NeuralAgent * agent = new NeuralAgent (!train);
+		return agent;}
 	default: return 0;
 	}
 }
@@ -53,7 +57,7 @@ void usage(const char *progname) {
 
 double utility(Agent *agent)
 {
-    const int episodes = 2048;
+       const int episodes = 2048;
 
 	double rewards = 0.0;
 
@@ -61,7 +65,10 @@ double utility(Agent *agent)
 	agent->set_test(true);
 
 	for (int i = 0; i < episodes; ++i) {
-		rewards += System().simulate(*agent, false);
+		double r = System().simulate(*agent, false);
+		rewards += r;
+		
+		cout << endl << "utility step = " << i << " r: " << r << endl;
 	}
 
 	agent->set_test(tmp);
@@ -69,18 +76,19 @@ double utility(Agent *agent)
 	return rewards / double(episodes);
 }
 
-int main(int argc, char **argv) {
+/*int main(int argc, char **argv) {
 	bool train = false;
 	AgentType agent_t = AT_None;
 
 	int  opt;
-	while ((opt = getopt(argc, argv, "tmsql")) != -1) {
+	while ((opt = getopt(argc, argv, "tmnsql")) != -1) {
 		switch (opt) {
 		case 't': train = true; break;
 		case 'm': agent_t = AT_MonteCarlo; break;
 		case 's': agent_t = AT_Sarsa; break;
 		case 'q': agent_t = AT_QLearning; break;
 		case 'l': agent_t = AT_SarsaLambda; break;
+		case 'n': agent_t = AT_Neuron; break;
 		default: usage(argv[0]); exit(1);
 		}
 	}
@@ -102,19 +110,22 @@ int main(int argc, char **argv) {
 		cout << "Reward: " << reward << endl;
 	}
 	else { //train
-		const int episodes = 1024;
+		const int episodes = 100000;
 		double rewards = 0.0;
 		int loops = episodes;
 
 		do {
-			rewards += System().simulate(*agent, false);
+			rewards = System().simulate(*agent, false);
+			if (loops % 100 == 0)
+				cout << endl << "train step = " << loops << " r: " << rewards << endl;
 		} while(loops--);
 
 		//evaluate policy
+		cout << "Training completes\n" << endl;
 		cout << utility(agent) << endl;
 	}
 
 	delete agent; //save learned table if necessarily
 
 	return 0;
-}
+}*/

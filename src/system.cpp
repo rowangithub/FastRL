@@ -40,13 +40,14 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		pole_.step(action); //taking action
 
 		if (pole_.fail()) {
-            if (!agent.test()) {
-                agent.fail(state, action, get_failure_reward()); //failure state - ���ʧ��״̬��һ��δ֪״̬��δ֪״̬��ʼ��Ϊ�㣩
-            }
+            		if (!agent.test()) {
+                		agent.fail(state, action, get_failure_reward()); 
+				//failure state - ���ʧ��״̬��һ��δ֪״̬��δ֪״̬��ʼ��Ϊ�㣩
+            		}
 
-			if (verbose) {
-				cout << " | Failure" << endl;
-			}
+			//if (verbose) {
+				//cout << " | Failure" << endl;
+			//}
 			step += 1;
 			break;
 		}
@@ -55,9 +56,10 @@ double System::simulate(Agent & agent, bool verbose, Logger *logger)
 		double reward = get_reward(); //observing immediate reward
 		int post_action = agent.plan(post_state); //choosing a'
 
-        if (!agent.test()) {
-            agent.learn(state, action, reward, post_state, post_action); //learning from experience - (s, a, r, s', a')
-        }
+        	if (!agent.test()) {
+            		agent.learn(state, action, reward, post_state, post_action); 
+			//learning from experience - (s, a, r, s', a')
+        	}
 
 		state = post_state;
 		action = post_action;

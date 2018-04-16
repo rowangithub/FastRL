@@ -16,11 +16,12 @@ void Pole::step(int action)
 	static const double mc = 1.0;
 	static const double mp = 0.1;
 
-	double force = ((!action)? 0: ((action > 0)? f : -f));
+	//double force = ((!action)? 0: ((action > 0)? f : -f));
+	double force = ((action == 1)? 0: ((action > 1)? f : -f));
 
-    if (action) {
-        force += irand(-f, f) * 0.5;
-    }
+    //if (action) {
+    //    force += irand(-f, f) * 0.5;
+    //}
 
 	double costheta = cos(theta_);
 	double sintheta = sin(theta_);

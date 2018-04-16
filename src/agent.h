@@ -15,7 +15,8 @@ enum AgentType {
 	AT_MonteCarlo,
 	AT_Sarsa,
 	AT_QLearning,
-	AT_SarsaLambda
+	AT_SarsaLambda,
+	AT_Neuron
 };
 
 class Agent {
