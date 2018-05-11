@@ -46,9 +46,9 @@ public:
 
 	void perturbation() { 
 		ballx = 0.6;
-		bally = (rand() % 101) / 100.f;
+		bally = (rand() % 101) / 100.f;//((rand() % 101 - 50) / 500.f) + 0.5; //(rand() % 101) / 100.f;
 		bvx = 1;
-		bvy = (rand() % 101 - 50) / 20.f;
+		bvy = (rand() % 101 - 50) / 20.f;//50.f; //20.f
 		posy = (rand() % 101) / 100.f;
     }
 

@@ -1,10 +1,18 @@
 // Main verification engine of neural networks
 //===================  Test and Verification of learned neural model =================== 
 #include "qlearner/action.h"
+#include "qlearner/qlearner.hpp"
+#include "qlearner/stats.h"
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <climits>
+#include <ctype.h>
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <chrono>
+#include <random>
 
 #include "config.h"
 #include "net/fc_layer.hpp"
@@ -19,15 +27,23 @@
 
 #include "pole.h"
 #include "pong.h"
+#include "thermostat.h"
+#include "drive.h"
 
-#include <random>
+// Used to define the libalf name space.
+#include <libalf/alf.h>
+// Angluin's L* algorithm
+#include <libalf/algorithm_angluin.h>
 
 using namespace net;
 using namespace qlearn;
+using namespace libalf;
 
 typedef std::vector<double> gamestate;
 
 Vector vec;
+
+int numSimulations;
 
 // Encode game state using vector
 const Vector& data(gamestate cpst)
@@ -96,7 +112,7 @@ void agentSample (Game& game, ComputationGraph& graph, int acts, std::vector<std
 }
 
 // test a learn model in file.
-void agentPlay (Game& game, std::string filename, int times) {
+void agentPlay (Game& game, std::string filename, int times, int bound=INT_MAX) {
 	Network agent;
 	agent.load (filename);
 	ComputationGraph graph(agent);
@@ -111,7 +127,7 @@ void agentPlay (Game& game, std::string filename, int times) {
 		display(game.getGameState());
 		int s = 0;
 		bool terminated = false;
-		while(true)
+		while(s < bound)
 		{
 			auto ac = getAction(graph, data(game.getGameState()));
 			//std::cout << s << ": "; display (game.getGameState(), ac.id);
@@ -128,7 +144,7 @@ void agentPlay (Game& game, std::string filename, int times) {
 				break;
 			}
 		}
-		if (terminated) succ++;
+		if (s == bound || terminated) succ++;
 	}
 	std::cout << (ts / times) << "\n";
 	std::cout << succ << " out of " << times << " terminates safely.\n";
@@ -164,6 +180,7 @@ int uct_advise (UCTGameSimulator& sim2, gamestate st, bool terminal) {
     UCTGameState* current = new UCTGameState (st);
     uct.setRootNode (current, sim2.getActions(), 0, terminal);
     uct.plan();
+    numSimulations += uct.numSimulations;
     UCT::SimAction* action = uct.getAction();
     const UCTGameAction* act = dynamic_cast<const UCTGameAction*> (action);
     return (act->id);
@@ -241,31 +258,24 @@ bool key_gen (Game& game, UCTGameSimulator& sim, ComputationGraph& graph, int bo
 	}
 }
 
-// CEGIS based training for controller synthesis.
-void cegis_train(Game& game, UCTGameSimulator& sim, int bound) {
-	Network network;
-	network << FcLayer(Matrix::Random(10, game.inputs()).array() / 5);
-	network << ReLULayer(Matrix::Zero(10, 1));
-	network << FcLayer(Matrix::Random(10, 10).array() / 5);
-	network << ReLULayer(Matrix::Zero(10, 1));
-	network << FcLayer(Matrix::Random(game.actions(), 10).array() / 5);
-	network << TanhLayer(Matrix::Zero(game.actions(), 1));
-	
-	ComputationGraph graph(network);
-
+// Internally used only
+void cegis_train(Game& game, UCTGameSimulator& sim, int bound, Network& network, ComputationGraph& graph) {
 	std::vector<std::pair<gamestate,int>> keyset;
 
 	int g = 0;
+	numSimulations = 0;
 	do {
 		int size = keyset.size();
 		bool fixable = key_gen (game, sim, graph, bound, keyset);
 		if (!fixable) {
-			std::cout << "Should go back to reinforcement learning?\n";
-			return;
+			std::cout << "Ignoring an unfixable trace...\n";
+			g = 0;
+			continue;
 		}
 		if (keyset.size() == size) {
 			g++;
 		} else {
+			std::cout << "Current model has been good in " << g << " times consecutively.\n";
 			g = 0;
 			// Supervised learning to train the controller.
 			auto prop = std::unique_ptr<RMSProp>(new RMSProp(0.9, 0.005, 0.001));
@@ -352,11 +362,58 @@ void cegis_train(Game& game, UCTGameSimulator& sim, int bound) {
 			} while (error > 0 && iteri < 10000);
 			std::cout << "batch training error number: " << error << "\n";
 		}
-	} while (g < 5);
-	network.save ("supervised_agent.network");
+	} while (g < 200);
 	std::cout << "Trained Successfully!\n";
+	std::cout << "Number of MCTS simulations: " << numSimulations << "\n";
+}
 
-	agentPlay(game, "supervised_agent.network", 100);
+// CEGIS based training for controller synthesis based on an existing network model.
+void cegis_train(Game& game, UCTGameSimulator& sim, int bound, std::string model) {
+	Network network;
+	network.load(model);
+	ComputationGraph graph(network);
+
+	cegis_train(game, sim, bound, network, graph);
+
+	// Assign a new name to the model
+	int i = model.size(), suffix = 0;
+	std::string modelname;
+	for(string::reverse_iterator k = model.rbegin(); k != model.rend(); ++k) {
+    	if (isdigit(*k)) 
+    		i--;
+	}
+	if (i != model.size()) {
+		suffix = std::stoi(model.substr(i));
+		suffix ++;
+		modelname = model.substr(0, i);
+	} else {
+		suffix ++;
+		modelname = model.substr(0, model.find("."));
+	}
+
+	std::string new_model_name = modelname + std::to_string(suffix) + ".network";
+	network.save (new_model_name);
+
+	agentPlay(game, new_model_name, 1000, bound);
+}
+
+// CEGIS based training for controller synthesis.
+void cegis_train(Game& game, UCTGameSimulator& sim, int bound) {
+	Network network;
+	network << FcLayer(Matrix::Random(10, game.inputs()).array() / 5);
+	network << ReLULayer(Matrix::Zero(10, 1));
+	network << FcLayer(Matrix::Random(10, 10).array() / 5);
+	network << ReLULayer(Matrix::Zero(10, 1));
+	network << FcLayer(Matrix::Random(game.actions(), 10).array() / 5);
+	network << TanhLayer(Matrix::Zero(game.actions(), 1));
+	
+	ComputationGraph graph(network);
+
+	cegis_train(game, sim, bound, network, graph);
+
+	network.save ("supervised_agent.network");
+
+	agentPlay(game, "supervised_agent.network", 1000, bound);
 }
 
 // Verify an abstraction
@@ -467,19 +524,21 @@ void abstraction_check (Game& game, std::string filename, int bound) {
 				}
 			}
 		}
-	} while (g < 10); // Verification converges after consecutive success in several rounds.
+	} while (g < 90); // Verification converges after consecutive success in several rounds.
 	std::cout << "Verifed!\n";
-
+	// Abstraction to file for hybrid system verification!
+	dt.interprete(filename+".abstraction");
+	std::cout << "Testing learned abstraction:\n";
 	int ts = 0;
 	int succ = 0;
-	for(int g = 0; g < 100; ++g)
+	for(int g = 0; g < 1000; ++g)
 	{
 		game.reset();
 		game.perturbation();
 		display(game.getGameState());
 		int s = 0;
 		bool terminated = false;
-		while(true)
+		while(s < bound)
 		{
 			gamestate st = game.getGameState();
 			double*  dtst = new double[game.inputs()];
@@ -502,11 +561,50 @@ void abstraction_check (Game& game, std::string filename, int bound) {
 		if (s >= bound || terminated) 
 			succ++;
 	}
-	std::cout << (ts / 100.0) << "\n";
-	std::cout << succ << " out of 100 games is successful.\n";
+	std::cout << (ts / 1000.0) << "\n";
+	std::cout << succ << " out of 1000 games is successful.\n";
 } 
 
-void testNetwork () {
+// void testPolicyFile (std::string policy) {
+// 	std::cout << "Testing a given policy file:\n";
+// 	int ts = 0;
+// 	int succ = 0;
+// 	for(int g = 0; g < 1000; ++g)
+// 	{
+// 		game.reset();
+// 		game.perturbation();
+// 		display(game.getGameState());
+// 		int s = 0;
+// 		bool terminated = false;
+// 		while(s < bound)
+// 		{
+// 			gamestate st = game.getGameState();
+// 			double*  dtst = new double[game.inputs()];
+// 			for (int i = 0; i < game.inputs(); i++) {
+// 				dtst[i] = st[i];
+// 			}
+// 			int ac = dt.predict (dtst, game.inputs());
+// 			delete [] dtst;
+// 			game.step(ac);
+			
+// 			bool failed = game.fail();
+// 			terminated = game.terminate();
+// 			s ++;
+// 			ts ++;
+// 			if( failed || terminated) {
+// 				std::cout << "Maintained in " << s << " steps\n";
+// 				break;
+// 			}
+// 		}
+// 		if (s >= bound || terminated) 
+// 			succ++;
+// 	}
+// 	std::cout << (ts / 1000.0) << "\n";
+// 	std::cout << succ << " out of 1000 games is successful.\n";
+// }
+
+/*
+void testNetworkTraining () {
 	Network network;
 	network << FcLayer(Matrix::Random(10, 5).array() / 5);
 	network << ReLULayer(Matrix::Zero(10, 1));
@@ -556,9 +654,93 @@ void testNetwork () {
 
 }
 
+void answer_Membership (std::list<int> query, std::list<std::list<int>>& experiences) {
+	// Should ask a hybrid system for membership query
+	// Fixme: but use existing experiences to answer for now.
+}
+
+bool check_Equivalence (conjecture * cj, std::list<std::list<int>>& experiences, 
+						Game& game, Dt& dt, std::list<int>& ce, double err, double conf) {
+	// Sample a sufficient number of example inputs.
+	int sample_size = 0;
+
+	for(int g = 0; g < sample_size; ++g)
+	{
+		game.reset();
+		game.perturbation();
+		display(game.getGameState());
+		int s = 0;
+		bool terminated = false;
+		while(true)
+		{
+			gamestate st = game.getGameState();
+			double*  dtst = new double[game.inputs()];
+			for (int i = 0; i < game.inputs(); i++) {
+				dtst[i] = st[i];
+			}
+			int ac = dt.predict (dtst, game.inputs());
+			delete [] dtst;
+			game.step(ac);
+			
+			bool failed = game.fail();
+			terminated = game.terminate();
+			s ++;
+			if( failed || terminated) {
+				break;
+			}
+		}
+		if (s >= bound || terminated) {// Good case!
+		} else {
+			return false;
+		}
+	}
+	return true;
+}
+
+// Use pac learning to verify a neural agent controller.
+// Idea: Compute a DFA to approximate all the possible decsion vectors of an abstaction.
+void pac_verify (Game& game, std::string filename, int bound, int n_jumps, double err, double conf) {
+	Network agent;
+	agent.load (filename);
+	ComputationGraph graph(agent);
+
+	int alphabet_size = n_jumps;
+	knowledgebase<bool> base;
+	// Create learning algorithm (Angluin L*) without a logger (2nd argument is NULL)
+	angluin_simple_table<bool> algorithm(&base, NULL, alphabet_size);
+	conjecture * result = NULL;
+
+	do {
+		conjecture * cj = algorithm.advance();
+		if (cj == NULL) {
+			list<list<int> > queries = base.get_queries();
+			list<list<int> >::iterator li;
+			for (li = queries.begin(); li != queries.end(); li++) {
+				bool a = answer_Membership(*li);
+				base.add_knowledge(*li, a);
+			}
+		} else {
+			list<int> ce;
+			bool is_equivalent = check_Equivalence(cj, ce, err, conf);
+			if (is_equivalent) {
+				result = cj;
+			} else {
+				algorithm.add_counterexample(ce);
+				delete cj;
+			}
+		}
+	} while (result == NULL);
+
+	std::cout << endl << "Sucessfully verified with:" << endl << result->visualize() << endl;
+	delete result;	
+}
+*/
+void train (Game& game, Game& test);
+
 int main(int argc, char** argv)
 {
 	if (argc > 1) {
+		std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 		std::string param(argv[1]);
 		if (param.compare ("uct") == 0) {
 			std::string gamename(argv[2]);
@@ -571,6 +753,12 @@ int main(int argc, char** argv)
 		    } else if (gamename.compare ("pole") == 0) {
 		    	sim = new UCTPoleSimulator ();
 		    	sim2 = new UCTPoleSimulator ();
+		    } else if (gamename.compare ("thermostat") == 0) {
+		    	sim = new UCTThermostatSimulator ();
+		    	sim2 = new UCTThermostatSimulator ();
+		    } else if (gamename.compare ("drive") == 0) {
+		    	sim = new UCTDriveSimulator();
+		    	sim2 = new UCTDriveSimulator();
 		    } else {
 		    	std::cout << "The game " << gamename << "is not found.\n";
 				return -1;
@@ -613,20 +801,68 @@ int main(int argc, char** argv)
 		} 
 		else if (param.compare ("cegis") == 0) {
 			std::string gamename(argv[2]);
+			std::string modelname = "";
+			if (argc > 3) {
+				std::string s(argv[3]);
+				modelname += s;
+			}	
+
 			if (gamename.compare ("pong") == 0) {
 				Pong game;
 				UCTPongSimulator sim;
-				cegis_train(game, sim, INT_MAX);
+				if (modelname.empty()) cegis_train(game, sim, INT_MAX);
+				else cegis_train(game, sim, INT_MAX, modelname);
 			} else if (gamename.compare ("pole") == 0) {
 				Pole game;
 				UCTPoleSimulator sim;
-				cegis_train(game, sim, 200);
+				if (modelname.empty()) cegis_train(game, sim, 200);
+				else cegis_train(game, sim, 200, modelname);
+			} else if (gamename.compare ("thermostat") == 0) {
+				Thermostat game;
+				UCTThermostatSimulator sim;
+				if (modelname.empty()) cegis_train (game, sim, 200);
+				else cegis_train(game, sim, 200, modelname);
+			} else if (gamename.compare ("drive") == 0) {
+				Drive game;
+				UCTDriveSimulator sim;
+				if (modelname.empty()) cegis_train (game, sim, 200);
+				else cegis_train(game, sim, 200, modelname); 
 			} else {
 				std::cout << "The game " << gamename << "is not found.\n";
 				return -1;
 			}
+		}
+		else if (param.compare("play") == 0) {
+			std::string gamename(argv[2]);
+			std::string model(argv[3]);
+			int bound = INT_MAX;
+			int times = 100;
+			if (argc > 4) {
+				std::string boundstr(argv[4]);
+				bound = std::stoi(boundstr);
+			}
+			if (argc > 5) {
+				std::string timestr(argv[5]);
+				times = std::stoi(timestr);
+			}
+			if (gamename.compare ("pong") == 0) {
+				Pong game;
+				agentPlay(game, model, times, bound);
+			} else if (gamename.compare ("pole") == 0) {
+				Pole game;
+				agentPlay(game, model, times, bound);
+			} else if (gamename.compare ("thermostat") == 0) {
+				Thermostat game;
+				agentPlay (game, model, times, bound);
+			} else if (gamename.compare ("drive") == 0) {
+				Drive game;
+				agentPlay (game, model, times, bound);
+			} else {
+				std::cout << "The game " << gamename << "is not found.\n";
+				return -1;
+			} 
 		} 
-		else {
+		else if (param.compare("verify") == 0){
 			//Network agent;
 			//agent.load (agentfile);
 			//ComputationGraph graph(agent);
@@ -645,9 +881,186 @@ int main(int argc, char** argv)
 			//networkToJson(agentfile);
 			
 			// -- doing abstraction refinement --
-			Pole game;
-			abstraction_check (game, param, 200);
+			std::string gamename(argv[2]);
+			std::string model(argv[3]);
+			if (gamename.compare("pong") == 0) {
+				Pong game;
+				abstraction_check (game, model, INT_MAX);
+			} else if (gamename.compare("pole") == 0) {
+				Pole game;
+				abstraction_check (game, model, 200);
+			} else if (gamename.compare("thermostat") == 0) {
+				Thermostat game;
+				abstraction_check (game, model, 200);
+			} else if (gamename.compare ("drive") == 0) {
+				Drive game;
+				abstraction_check (game, model, 200);
+			} else {
+				std::cout << "The game " << gamename << "is not found.\n";
+				return -1;
+			}
 		}
+		else if (param.compare("train") == 0) {
+			std::string gamename(argv[2]);
+			if (gamename.compare("pong") == 0) {
+				Pong game;
+				Pong test;
+				train (game, test);
+			} else if (gamename.compare("pole") == 0) {
+				Pole game;
+				Pole test;
+				train (game, test);
+			} else if (gamename.compare("thermostat") == 0) {
+				Thermostat game;
+				Thermostat test;
+				train (game, test);
+			} else if (gamename.compare ("drive") == 0) {
+				Drive game;
+				Drive test;
+				train (game, test);
+			} else {
+				std::cout << "The game " << gamename << "is not found.\n";
+				return -1;
+			}
+		}
+		std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    	auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+    	cout << "Executed in " << duration << " microseconds.\n";
 		return 0;
 	}
+	return 0;
+}
+
+std::mutex mTargetNet;
+std::atomic<bool> evaluate(false);
+std::atomic<bool> run(true);
+
+void learn_thread( Game& game, Network& target_net, ComputationGraph& graph )
+{
+	Config config(game.inputs(), game.actions(), 2000000);
+	config.epsilon_steps(2000000).update_interval(10000).batch_size(32).init_memory_size(10000).init_epsilon_time(100000)
+		.discount_factor(0.98);
+	
+	Network network;
+	network << FcLayer(Matrix::Random(10, game.inputs()).array() / 5);
+	network << ReLULayer(Matrix::Zero(10, 1));
+	network << FcLayer(Matrix::Random(10, 10).array() / 5);
+	network << ReLULayer(Matrix::Zero(10, 1));
+	network << FcLayer(Matrix::Random(game.actions(), 10).array() / 5);
+	//network << TanhLayer(Matrix::Zero(game.actions(), 1));
+	
+	qlearn::QLearner learner( config, std::move(network) );
+	
+	auto prop = std::unique_ptr<RMSProp>(new RMSProp(0.9, 0.0005, 0.001));
+	RMSProp* rmsprop = prop.get();
+	Solver solver( std::move(prop) );
+	
+	std::fstream rewf("reward.txt", std::fstream::out);
+
+	game.reset ();
+	game.perturbation ();
+
+	int ac = 0;
+	int games = 0;
+	auto last_time = std::chrono::high_resolution_clock::now();
+//	bool run = true;
+	
+	learner.setCallback( [&](const QLearner& learner, const Stats& stats ) 
+	{
+		std::cout << games << ": " << learner.getCurrentEpsilon() << "\n";
+		std::cout << stats.getSmoothReward() << " (" <<  stats.getSmoothQVal() << ", " << stats.getSmoothMSE() << ")\n";
+		rewf << stats.getSmoothReward() << "\t" <<  stats.getSmoothQVal() << "\t" << stats.getSmoothMSE() << " " << learner.getCurrentEpsilon()  << "\n";
+		rewf.flush();
+//		std::cout << learner.getNumberLearningSteps() << "\n";
+		std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(
+					std::chrono::high_resolution_clock::now() - last_time).count() << " ms\n";
+		last_time = std::chrono::high_resolution_clock::now();
+//		std::cout << Eigen::internal::malloc_counter() << "\n";
+		std::cout << " - - - - - - - - - - \n";
+		std::lock_guard<std::mutex> lck(mTargetNet);
+		target_net = learner.network().clone();
+		graph = ComputationGraph(target_net);
+		evaluate = true;
+	} );
+
+	while(run)
+	{
+		/*if(games < 1000)
+		{
+			rmsprop->setRate(0.001);
+		} else if ( games < 5000 )
+		{
+			rmsprop->setRate(0.005);
+		} else
+		{
+			rmsprop->setRate(0.0001);
+		}*/
+
+		game.step(ac);
+		float r = 0;
+		bool failed = game.fail();
+		bool terminated = game.terminate();
+		if (failed) r = -1;
+		if (terminated) r = 1;
+
+		ac = learner.learn_step( data (game.getGameState()), r, failed || terminated, solver );
+		if( failed || terminated )
+		{
+			game.reset();
+			game.perturbation ();
+			games++;
+		}
+	}
+}
+
+void train (Game& game, Game& test) {
+	Network network;
+	ComputationGraph graph(network);
+	std::thread learner( learn_thread, std::ref(game), std::ref(network), std::ref(graph) );
+	learner.detach();
+
+	int games = 0;
+
+	std::fstream evl("test.txt", std::fstream::out);
+	
+	int step = 0;
+	while(true)
+	{	
+		if(evaluate)
+		{
+			Network copy = network.clone();
+			ComputationGraph graph(copy);
+			float reward = 0;
+			int ts = 0;
+			for(int g = 0; g < 200; ++g)
+			{
+				test.reset();
+				test.perturbation();
+				for(int s = 0; s < 200; ++s)
+				{
+					auto ac = getAction(graph, data(test.getGameState()));
+					test.step(ac.id);
+					float currReward = 0;
+					bool failed = test.fail();
+					bool terminated = test.terminate();
+					if (failed) currReward = -1;
+					if (terminated) currReward = 1;
+					reward += currReward;
+					ts ++;
+					if( failed || terminated) break;
+				}
+			}
+			std::cout << "Steps: " << (ts / 200.0) << "\n";
+			std::cout << "Rewards: " << reward << "\n";
+			if (ts / 200.0 == 200.0 || reward == 200) {
+				copy.save ("train_agent" + std::to_string(step) + ".network");
+			}
+			evl << reward << "\n";
+			evl.flush();
+			evaluate = false;
+			step ++;
+			sleep (10);
+		}
+	}
+	run = false;
 }

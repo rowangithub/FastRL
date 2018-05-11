@@ -44,6 +44,14 @@ public:
 		Py_Finalize();
 	}
 
+	int interprete (std::string outputfile) {
+		PyObject* result = PyObject_CallMethod(dt_instance, (char*)"interprete", (char*)"(s)", outputfile.c_str());
+    	assert(result != NULL);
+    	//int ac = PyInt_AsLong(result);
+    	Py_DECREF(result);
+    	return 1;
+	}
+
 	int learn (std::string datafile) {
 		PyObject* result = PyObject_CallMethod(dt_instance, (char*)"learn", (char*)"(ss)", datafile.c_str(), nnfile.c_str());
     	assert(result != NULL);

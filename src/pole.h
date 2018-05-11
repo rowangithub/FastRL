@@ -35,7 +35,7 @@ public:
 	}
 
 	double measureFailure() const {
-		return -1;
+		return -1 * std::abs(x_ - 1.0) * std::abs(theta_ - 15.0 * one_degree);
 	}
 
 	void perturbation() { //微小扰动 - 模拟人放置杆子

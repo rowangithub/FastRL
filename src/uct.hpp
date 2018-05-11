@@ -141,6 +141,8 @@ public:
   double endEpisodeValue_;
   // rand seed value
   StateNode* root_;
+  // Total number of simulations performed
+  int numSimulations;
 
   UCTPlanner(Simulator* _sim, int _maxDepth, int _numRuns, double _ucbScalar, double _gamma, double _leafValue = 0, double _endEpisodeValue = 0):
     sim_(_sim),
@@ -150,7 +152,7 @@ public:
     gamma_(_gamma),
     leafValue_(_leafValue),
     endEpisodeValue_(_endEpisodeValue),
-    root_(NULL) {}
+    root_(NULL),numSimulations(0) {}
 
   // does not handle sim_
   ~UCTPlanner() {

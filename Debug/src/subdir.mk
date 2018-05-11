@@ -9,7 +9,6 @@ CPP_SRCS += \
 ../src/main.cpp \
 ../src/monte-carlo.cpp \
 ../src/pole.cpp \
-../src/pong.cpp \
 ../src/qlearning.cpp \
 ../src/random-agent.cpp \
 ../src/sarsa-lambda.cpp \
@@ -41,6 +40,7 @@ CPP_SRCS += \
 ../src/qlearner/stats.cpp \
 ../src/uct.cpp \
 ../src/dt.cpp \
+../src/discritize.cpp \
 ../src/verify.cpp
 
 OBJS += \
@@ -49,7 +49,6 @@ OBJS += \
 ./src/main.o \
 ./src/monte-carlo.o \
 ./src/pole.o \
-./src/pong.o \
 ./src/qlearning.o \
 ./src/random-agent.o \
 ./src/sarsa-lambda.o \
@@ -81,6 +80,7 @@ OBJS += \
 ./src/qlearner/stats.o \
 ./src/uct.o \
 ./src/dt.o \
+./src/discritize.o\
 ./src/verify.o
 
 CPP_DEPS += \
@@ -89,7 +89,6 @@ CPP_DEPS += \
 ./src/main.d \
 ./src/monte-carlo.d \
 ./src/pole.d \
-./src/pong.d \
 ./src/qlearning.d \
 ./src/random-agent.d \
 ./src/sarsa-lambda.d \
@@ -121,6 +120,7 @@ CPP_DEPS += \
 ./src/qlearner/stats.d \
 ./src/uct.d \
 ./src/dt.d \
+./src/discritize.d \
 ./src/verify.d
 
 # Each subdirectory must supply rules for building sources it contributes

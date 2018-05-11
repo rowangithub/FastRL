@@ -273,6 +273,7 @@ double UCTPlanner::MC_Sampling(StateNode* node, int depth) {
     mcReturn += discnt * modifyReward(r);
     discnt *= gamma_;
   }
+  numSimulations++;
   return mcReturn;
 }
 
@@ -288,6 +289,7 @@ double UCTPlanner::MC_Sampling(StateNode* node) {
     mcReturn += discnt * modifyReward(r);
     discnt *= gamma_;
   }
+  numSimulations++;
   return mcReturn;
 }
 

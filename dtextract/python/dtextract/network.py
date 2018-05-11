@@ -104,13 +104,20 @@ class Network(object):
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
 
     def feedforward(self, a):
-        nonlinear_weights = self.weights[:len(self.biases)]
-        linear_weights = self.weights[len(self.biases):]
-        """Return the output of the network if ``a`` is input."""
-        for b, w in zip(self.biases, nonlinear_weights):
-            a = tanh(np.dot(w, a)+b)
-        for w in linear_weights:
-            a = np.dot(w, a)
+        # nonlinear_weights = self.weights[:len(self.biases)]
+        # linear_weights = self.weights[len(self.biases):]
+        # for b, w in zip(self.biases, nonlinear_weights):
+        #    a = relu(np.dot(w, a)+b)
+        # for w in linear_weights:
+        #    a = np.dot(w, a)
+        # return a
+        relu_weights = self.weights[:(len(self.biases)-1)]
+        tanh_weights = self.weights[(len(self.biases)-1)]
+        relu_biases = self.biases[:(len(self.biases)-1)]
+        tanh_biases = self.biases[(len(self.biases)-1)]
+        for b, w in zip(relu_biases, relu_weights):
+            a = relu(np.dot(w, a)+b)
+        a = tanh(np.dot(tanh_weights, a) + tanh_biases)
         return a
 
     def predict (self, data):
@@ -327,10 +334,13 @@ def sigmoid_prime(z):
 def tanh(z):
     return np.tanh(z)
 
+def relu(z):
+    return np.maximum(z, 0)
+
 if __name__ == "__main__":
-    net = load ("../../games/pole/agent163.network.json")
+    net = load ("../../games/pole/supervised_agent.network.json")
     net.save("temp2.network")
-    test = [[-0.224485, 0.0258101, 0.00786877, -0.0469486],[1, 2, 3, 4]]
+    test = [[0.6,0.41,0.31,1,0.75],[0.74,0.515,0.31,1,0.75], [0.95,0.6725,0.71,1,0.75], [0.99,0.0405,0.13,1,1.95], [0.93,0.4755,0.23,1,-0.65]]
     test = np.array(test)
     #test = np.array([(x[None].T) for x in np.array(test)])
     #print test
