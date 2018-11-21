@@ -1,9 +1,22 @@
 # pole
-
-[![Build Status](https://travis-ci.org/aijunbai/pole.svg?branch=master)](https://travis-ci.org/aijunbai/pole)  
-
 Reinforcement Learning algorithms for an inverted pendulum with a cart.
-Generated log files can be played by [rcg\_player](https://github.com/aijunbai/rcg_player).
+
 
 # Dependencies
 - libboost-dev
+
+
+# Compile
+./trainall.sh Debug
+
+
+# Train DQN
+./Debug/pole train pole
+
+
+# Train using MCTS and Supervised Learning
+./Debug/pole cegis pole
+
+
+# Test the trained neural network in 1000 episodes each of which consists of 200 steps.
+./Debug/pole play pole supervised_agent.network 200 1000
