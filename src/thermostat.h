@@ -12,7 +12,7 @@
 class Logger;
 
 class Thermostat : public Game {
-	static constexpr double time_step = 1;
+	static constexpr double time_step = 0.2;
 
 private:
 	double x;
@@ -24,14 +24,17 @@ public:
 	}
 
 	bool terminate() const {
-		return false;
+		if (inv_mode)
+			return (game_step >= 1 && (x >= 68 && x <= 72));
+		else
+			return false;
 	}
 
 	bool fail() const {
-		if( x <= 63 || x >= 76) {
-			return true;
-		}
-		return false;
+		if (inv_mode)
+			return game_step >= 1 && (x < 68 || x > 72);
+		else 
+			return ( x <= 63 || x >= 76);
 	}
 
 	double measureFailure() const {
@@ -45,12 +48,15 @@ public:
 
 	void reset()
 	{
+		if (inv_mode) game_step = 0;
 		x = 0;
 		mode = 0;
 	}
 
 	void step( int ac )
 	{
+		if (inv_mode) game_step += 1;
+
 		mode = ac;
 
 		if (mode == 0) {

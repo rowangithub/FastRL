@@ -1,3 +1,6 @@
+#ifndef CONFIG_H_
+#define CONFIG_H_
+
 #include <eigen3/Eigen/Dense>
 #include <vector>
 
@@ -15,3 +18,7 @@ namespace net
 	class Network;
 }
 
+// manage the number of python embedding instances
+extern int python_mutex;
+
+#endif

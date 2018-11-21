@@ -6,6 +6,7 @@
 #include "config.h"
 #include "uct.hpp"
 #include "computation_graph.hpp"
+#include "dt.h"
 
 class UCTGameSimulator;
 
@@ -25,12 +26,37 @@ public:
 	virtual int actions() = 0;
 	virtual int inputs() = 0;
 
-    // Get and Set for simulator to access internal Pole state
+    // Get and Set for simulator to access internal game state
 	virtual std::vector<double> getGameState () = 0;
 	
     virtual void setGameState (std::vector<double> st) = 0;
 
     virtual void printGameState() = 0;
+
+    /* -------------- Begin -- used for cegis-inv --------------*/
+    // Get and Set for uct to access internal game state
+    // This is redundant to getGameState usually but a place to let uct access more information in the context of cegis-inv.
+    std::vector<double> getUCTState () {
+        //std::vector<double> data;
+        //data.push_back(x);
+        //data.push_back(gamma);
+        std::vector<double> data = getGameState();
+        if (inv_mode)
+            data.push_back(game_step);
+        return data;          
+    }
+
+    void setUCTState (std::vector<double> st) {
+        //x = st[0];
+        //gamma = st[1];
+        setGameState(st);
+        if (inv_mode)
+            game_step = st[inputs()];
+    }
+
+    bool inv_mode = false;
+    int game_step = 0;
+    /* -------------- End -- used for cegis-inv --------------*/
 };
 
 class UCTGameState : public UCT::State {
@@ -105,6 +131,7 @@ public:
     Game* game = NULL;
     // Game AI
     net::ComputationGraph* policy = NULL;
+    DT* dt = NULL;
 
     UCTGameState* current = NULL;
     vector<UCT::SimAction*> actVect;
@@ -121,9 +148,10 @@ public:
         	actVect.push_back (new UCTGameAction (i));
         }
 
-        current = new UCTGameState (game->getGameState());
+        current = new UCTGameState (game->getUCTState());
 
         this->policy = NULL;
+        this->dt = NULL;
     }
 
     void init (Game* game, net::ComputationGraph* policy) {
@@ -137,7 +165,7 @@ public:
         for (int i = 0; i < game->actions(); i++) {
         	actVect.push_back (new UCTGameAction (i));
         }
-        current = new UCTGameState (game->getGameState());
+        current = new UCTGameState (game->getUCTState());
 
         this->policy = policy;
     }
@@ -160,7 +188,7 @@ public:
             return;
         }
         current->setState (other->gstate);
-        game->setGameState (other->gstate);
+        game->setUCTState (other->gstate);
     }
 
     virtual UCT::State* getState () {
@@ -170,9 +198,9 @@ public:
     // Return the index of the action that should be used for mc sampling.
     virtual int MC_action () {
     	assert (game != NULL);
-        if (policy == NULL) {
+        if (policy == NULL && dt == NULL) {
             return rand() % actVect.size();
-        } else {
+        } else if (policy != NULL) {
             Vector vec;
             vec.resize (game->inputs());
             for (int i = 0; i < game->inputs(); i++) {
@@ -183,6 +211,14 @@ public:
             int row, col;
             result.maxCoeff(&row,&col);
             return row;
+        } else { // DT is not NULL
+            double*  dtst = new double[game->inputs()];
+            for (int i = 0; i < game->inputs(); i++) {
+                dtst[i] = (current->gstate)[i];
+            }
+            int ac = dt->predict (dtst, game->inputs());
+            delete [] dtst;
+            return ac;
         }
     }
 
@@ -198,9 +234,9 @@ public:
         //if (rand() / (double) RAND_MAX < 0.1) {
         //    id = rand() % 4;
         //}
-        game->setGameState (current->gstate);
+        game->setUCTState (current->gstate);
         game->step (id);
-        current->setState (game->getGameState());
+        current->setState (game->getUCTState());
         return game->fail() ? game->measureFailure() : 1;
     }
 
@@ -217,12 +253,17 @@ public:
     	assert (game != NULL);
         game->reset ();
         game->perturbation ();
-        current->setState (game->getGameState());
+        current->setState (game->getUCTState());
     }
 
     virtual void reset (net::ComputationGraph* policy) {
     	reset ();
     	this->policy = policy;
+    }
+
+    virtual void reset (DT* dt) {
+        reset ();
+        this->dt = dt;
     }
 }; 
 

@@ -1,7 +1,7 @@
 from runCompare import *
 from ..network import *
 
-DT_DATA_TYPES = [NUM, NUM, NUM, NUM, CAT_RES]
+DT_DATA_TYPES = [NUM, CAT_RES]
 
 DT_OUTPUT = 'dt.log'
 
@@ -37,23 +37,31 @@ class DecisionTree:
 		self.dtExtract = None
 		self.greedyDT = None
 
-	def interprete(self, savepath):
-		tree_to_code(self.greedyDT, ["x", "dx", "theta", "dtheta"], savepath)
+	def interprete(self, savepath, number_of_features):
+		DATA_TYPES = []
+		for x in range(number_of_features):
+			DATA_TYPES.append ("x"+str(x))
+		tree_to_code(self.greedyDT, DATA_TYPES, savepath)
 
 	def getFunc(self, rf):
 		return lambda xs: rf.predict(xs)
 
 	# Learning a decision tree abstraction of a neural network
-	def learn(self, datapath, netpath):
+	def learn(self, datapath, netpath, number_of_features, dt_size):
 		hasHeader = False
 		isClassify = True
 		nDataMatrixCols = None
 		distType = "CategoricalGaussianMixture"
 		setCurOutput(DT_OUTPUT)
 
+		DATA_TYPES = []
+		for x in range(number_of_features):
+			DATA_TYPES.append (NUM)
+		DATA_TYPES.append (CAT_RES)		
+
 		# Step 1: Load and Set up
 		log('Parsing CSV...', INFO)
-		(df, res, resMap, catFeats) = readCsv(datapath, hasHeader, DT_DATA_TYPES)
+		(df, res, resMap, catFeats) = readCsv(datapath, hasHeader, DATA_TYPES)
 		log('Done!', INFO)
 
 		log('Splitting into training and test...', INFO)
@@ -65,22 +73,22 @@ class DecisionTree:
 		(XTest, yTest, catFeatIndsTest, numericFeatIndsTest) = constructDataMatrix(testDf, res, catFeats)
 		log('Done!', INFO)
 
-		log('Loading neural net...', INFO)
-		#rfConstructor = MLPClassifier if isClassify else MLPRegressor
-		#rf = rfConstructor(solver='lbfgs', hidden_layer_sizes=(hiddenSize,))
-		#rf.fit(XTrain, yTrain)
-		rf = load(netpath)
-		log('Done!', INFO)
+		#log('Loading neural net...', INFO)
+			#rfConstructor = MLPClassifier if isClassify else MLPRegressor
+			#rf = rfConstructor(solver='lbfgs', hidden_layer_sizes=(hiddenSize,))
+			#rf.fit(XTrain, yTrain)
+		#rf = load(netpath)
+		#log('Done!', INFO)
 
-		rfFunc = self.getFunc(rf)
+		#rfFunc = self.getFunc(rf)
 
-		rfScoreFunc = f1Vec if isClassify else mseVec
+		#rfScoreFunc = f1Vec if isClassify else mseVec
 
-		rfTrainScore = rfScoreFunc(rfFunc, XTrain, yTrain)
-		rfTestScore = rfScoreFunc(rfFunc, XTest, yTest)
+		#rfTrainScore = rfScoreFunc(rfFunc, XTrain, yTrain)
+		#rfTestScore = rfScoreFunc(rfFunc, XTest, yTest)
 
-		log('Training score: ' + str(rfTrainScore), INFO)
-		log('Test score: ' + str(rfTestScore), INFO)
+		#log('Training score: ' + str(rfTrainScore), INFO)
+		#log('Test score: ' + str(rfTestScore), INFO)
 
 
 		# Step 2: Distribution
@@ -104,9 +112,9 @@ class DecisionTree:
 	    # Step 4: Train a (greedy) decision tree
 		scoreFunc = f1 if isClassify else mse
 		log('Training greedy decision tree', INFO)
-		maxLeaves = (maxDtSize + 1)/2
+		maxLeaves = (dt_size + 1)/2
 		dtConstructor = DecisionTreeClassifier if isClassify else DecisionTreeRegressor
-		self.greedyDT = dtConstructor(max_leaf_nodes=maxLeaves)
+		self.greedyDT = dtConstructor(max_leaf_nodes=maxLeaves,random_state=0)
 		self.greedyDT.fit(XTrain, yTrain)
 		log('Done!', INFO)
 		log('Node count: ' + str(self.greedyDT.tree_.node_count), INFO)
@@ -127,7 +135,7 @@ class DecisionTree:
 		log('Training score: ' + str(dtTrainTrainScore), INFO)
 		log('Test score: ' + str(dtTrainTestScore), INFO)
 
-		return [rfTrainScore, rfTestScore,
+		return [#rfTrainScore, rfTestScore,
 			dtTrainRelTrainScore, dtTrainRelTestScore, dtTrainTrainScore, dtTrainTestScore]
 
 
@@ -231,7 +239,7 @@ class DecisionTree:
 
 	def predict(self, data):	
 		if (self.greedyDT == None):
-			return 0
+			return random.randint(0, 2)
 		else:
 			data = np.asarray(data)
 			data = data.reshape(1,-1)

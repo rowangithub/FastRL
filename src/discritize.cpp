@@ -474,6 +474,7 @@ int main_verify(int argc, char** argv)
 
 	Grid g(pole, graph, dimensions, init_zones, error_zones);
 	g.verify (1000, 200);
+	return 0;
 }
 
 #endif /* GRID_H_ */

@@ -27,22 +27,39 @@ public:
 	}
 
 	bool terminate() const {
-		return false; // The goal is that the pole is always on.
+		if (inv_mode) {
+			return game_step >= 10 && (fabs(x_) <= 0.1 && fabs(dx_) <= 0.1 && fabs(theta_) <= 0.01 && fabs(dtheta_) <= one_degree);
+		} else
+			return false; // The goal is that the pole is always on.
 	}
 
 	bool fail() const {
-		return fabs(x_) > 1.0 || fabs(theta_) > 15.0 * one_degree;
+		if (inv_mode) {
+			return game_step >= 10 && (fabs(x_) > 0.1 || fabs(dx_) > 0.1 || fabs(theta_) > 0.01 || fabs(dtheta_) > one_degree);
+		} else
+			return fabs(x_) > 1.0 || fabs(theta_) > 15.0 * one_degree;
 	}
 
 	double measureFailure() const {
-		return -1 * std::abs(x_ - 1.0) * std::abs(theta_ - 15.0 * one_degree);
+		if (inv_mode)
+			return -1.0;
+		else
+			return -1.0 * std::abs(x_ - 1.0) * std::abs(theta_ - 15.0 * one_degree);
 	}
 
-	void perturbation() { //微小扰动 - 模拟人放置杆子
-		dtheta_ = irand(-one_degree, one_degree);
+	void perturbation() {
+		if (inv_mode) {
+			x_ = irand(-0.1, 0.1);
+			dx_ = irand(-0.1, 0.1);
+			theta_ = irand(-0.01, 0.01);
+			dtheta_ = irand(-one_degree, one_degree);
+		} else
+			dtheta_ = irand(-one_degree, one_degree);
     }
     
 	void reset() {
+		if (inv_mode) game_step = 0;
+
 		x_ = 0.0;
 		dx_ = 0.0;
 		theta_ = 0.0;

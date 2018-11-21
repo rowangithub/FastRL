@@ -1,6 +1,12 @@
+#ifndef DT_H_
+#define DT_H_
+
 #include <Python.h>
 #include <stdio.h>
 #include <string>
+#include <iostream>
+
+#include "config.h"
 
 // Learning abstractions of a neural model
 class DT {
@@ -11,9 +17,12 @@ class DT {
 
 public: 
 	DT (std::string nnfile) {
-		setenv("PYTHONPATH", ".", 1);
+		if (python_mutex == 0) {
+			setenv("PYTHONPATH", ".", 1);
+			Py_Initialize();
+		}
+		python_mutex ++;
 
-		Py_Initialize();
 		//PySys_SetArgv(argc, argv);
     	//pName = PyString_FromString(argv[1]);
 
@@ -41,19 +50,21 @@ public:
 		Py_DECREF(dt_klass);
 		Py_DECREF(dt_module);
 
-		Py_Finalize();
+		python_mutex --;
+		if (python_mutex == 0)
+			Py_Finalize();
 	}
 
-	int interprete (std::string outputfile) {
-		PyObject* result = PyObject_CallMethod(dt_instance, (char*)"interprete", (char*)"(s)", outputfile.c_str());
+	int interprete (std::string outputfile, int number_of_feature) {
+		PyObject* result = PyObject_CallMethod(dt_instance, (char*)"interprete", (char*)"(si)", outputfile.c_str(), number_of_feature);
     	assert(result != NULL);
     	//int ac = PyInt_AsLong(result);
     	Py_DECREF(result);
     	return 1;
 	}
 
-	int learn (std::string datafile) {
-		PyObject* result = PyObject_CallMethod(dt_instance, (char*)"learn", (char*)"(ss)", datafile.c_str(), nnfile.c_str());
+	int learn (std::string datafile, int number_of_feature, int dt_size) {
+		PyObject* result = PyObject_CallMethod(dt_instance, (char*)"learn", (char*)"(ssii)", datafile.c_str(), nnfile.c_str(), number_of_feature, dt_size);
     	assert(result != NULL);
     	//int ac = PyInt_AsLong(result);
     	Py_DECREF(result);
@@ -78,3 +89,5 @@ public:
     	return ac;
 	}
 };
+
+#endif /* DT_H_ */

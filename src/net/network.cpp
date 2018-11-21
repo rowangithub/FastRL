@@ -109,7 +109,7 @@ bool Network::load (std::string filename)
 
 std::string fix_json_numbers(const std::string& json_str)
 {
-    std::regex re("\\\"(-?[0-9]+\\.{0,1}[0-9]*)\\\"");
+    std::regex re("\\\"(-?[0-9]+\\.{0,1}[0-9]*(e-?[0-9]+)?)\\\"");
     return std::regex_replace(json_str, re, "$1");
 }
 

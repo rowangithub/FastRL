@@ -27,34 +27,53 @@ public:
 	}
 
 	bool terminate() const {
-		return false;
+		if (inv_mode) {
+			// Successfully terminates within the invariant.
+			return (game_step >= 10 && (x > -0.9 && x < 0.9 && gamma > -0.79 && gamma < 0.79));
+		} else {
+			return false;
+		}
 	}
 
 	bool fail() const {
-		if( x <= -2 || x >= 2) {
-			return true;
+		if (inv_mode) {
+			// Unsuccessfully terminates without respecting the invariant.
+			return game_step >= 10 && (x <= -0.9 || x >= 0.9 || gamma <= -0.79 || gamma >= 0.79);
+		} else {
+			return (x <= -2 || x >= 2);
 		}
-		return false;
 	}
 
 	double measureFailure() const {
-		return -1.0;
+		if (inv_mode) {
+			return -1.0;
+		} else
+			return -1.0;
 	}
 
 	void perturbation() { 
-		x = irand(-1, 1);
-		gamma = irand(-1*w, w);
+		if (inv_mode) {
+			x = irand (-0.9, 0.9);
+			gamma = irand (-0.79, 0.79);
+		} else {
+			x = irand(-1, 1);
+			gamma = irand(-1*w, w);
+		}
     }
 
 	void reset()
 	{
+		if (inv_mode) game_step = 0;
+
 		x = 0;
 		gamma = 0;
 	}
 
 	void step( int ac )
 	{
-		double ddx = -1*r*sin(gamma);
+		if (inv_mode) game_step += 1;
+
+		double ddx = r*sin(gamma);
 		x += time_step * ddx;
 		double ddgamma = 0;
 		if (ac == 0) { // Drive Left
@@ -82,7 +101,7 @@ public:
     }
 
     void printGameState() {
-		std::cout << "(" << x << "," << gamma << ")\n";
+			std::cout << "(" << x << "," << gamma << ")\n";
 	}
 
     int actions() {return 3;}
